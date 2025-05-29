@@ -1,0 +1,58 @@
+.card {
+  list-style: none;
+  margin: 0.5rem 0;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--color-dark--3, #444);
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  background-color: var(--color-dark--2, #2a2a2a);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+  color: #f1f1f1;
+  cursor: pointer;
+  max-width: 400px;
+}
+
+.card:hover {
+  background-color: var(--color-dark--1, #3a3a3a);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.colorBar {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.username {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #fff;
+}
+
+.expanded {
+  background-color: var(--color-dark--1, #3a3a3a);
+  border-color: var(--color-dark--3, #555);
+}
+
+.cities {
+  margin-top: 0.75rem;
+  padding-left: 1rem;
+  border-left: 2px solid rgba(255, 255, 255, 0.1);
+  background: transparent;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+  max-height: 0;
+}
+
+.card.expanded .cities {
+  max-height: 250px; /* or a dynamic value if animated */
+  overflow-y: auto;  /* Enable vertical scrolling */
+}

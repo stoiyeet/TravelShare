@@ -10,7 +10,7 @@ import BackButtonRefresh from "./BackButtonRefresh";
 
 function City() {
   const { id } = useParams();
-  const { getCity, currentCity, isLoading, updateCity } = useCities();
+  const { getCity, currentCity, updateCity } = useCities();
   const { user } = useAuth();
   const [formDate, setFormDate] = useState("");
   const [formNotes, setFormNotes] = useState("");
@@ -22,7 +22,7 @@ function City() {
   useEffect(() => {
   if (currentCity) {
     setFormDate(currentCity.date ? new Date(currentCity.date).toISOString().split("T")[0] : "");
-    setFormNotes(currentCity.notes || "");
+    setFormNotes(currentCity.notes ? currentCity.notes : "");
   }
 }, [currentCity]);
 
@@ -36,7 +36,8 @@ function City() {
     const formData = new FormData(e.target);
     const updatedNotes = formData.get("notes");
     const updatedDate = formData.get("date");
-    updateCity(id, { notes: updatedNotes, date: updatedDate });
+    const fixedDate = new Date(updatedDate + "T12:00:00Z");
+    updateCity(id, { notes: updatedNotes, date: fixedDate });
     e.target.reset();
   }
 
@@ -79,6 +80,7 @@ function City() {
                 value={formNotes}
                 onChange={(e) => setFormNotes(e.target.value)}
                 placeholder="Type your notes here..."
+                name = "notes"
               />
             </div>
 

@@ -1,4 +1,4 @@
-const SERVER_URL = "http://localhost:9000";
+const SERVER_URL = process.env.Server_Base_URL|| "http://localhost:9000";
 
 export async function authAPI(endpoint, method, data = null) {
   const options = {

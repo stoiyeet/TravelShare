@@ -26,7 +26,7 @@ app.use(cookieParser());
 // CORS configuration - VERY IMPORTANT for cookies
 app.use(
   cors({
-    origin: "http://localhost:5173", // Your frontend URL
+    origin: process.env.Client_Base_URL || "http://localhost:5173", // Your frontend URL
     credentials: true, // This is crucial for cookies
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS","PATCH"],
     allowedHeaders: ["Content-Type", "Authorization"],

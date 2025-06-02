@@ -23,10 +23,13 @@ const app = express();
 // IMPORTANT: cookieParser must come BEFORE other middleware
 app.use(cookieParser());
 
+const allowedOrigin = process.env.Client_Base_URL.replace(/\/$/, ""); // remove trailing slash if any
+
+
 // CORS configuration - VERY IMPORTANT for cookies
 app.use(
   cors({
-    origin: process.env.Client_Base_URL || "http://localhost:5173", // Your frontend URL
+    origin: allowedOrigin|| "http://localhost:5173", // Your frontend URL
     credentials: true, // This is crucial for cookies
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS","PATCH"],
     allowedHeaders: ["Content-Type", "Authorization"],

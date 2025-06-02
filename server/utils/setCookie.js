@@ -11,8 +11,8 @@ exports.setAuthCookie = (res, userId) => {
 
   const cookieOptions = {
     httpOnly: true,
-    sameSite: "lax",
-    secure: false, // false for localhost HTTP
+    sameSite: "none",
+    secure: true, // Set to true if using HTTPS
     maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
     path: "/", // Explicitly set path
   };

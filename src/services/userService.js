@@ -1,4 +1,4 @@
-const SERVER_URL = process.env.Server_Base_URL || "http://localhost:9000";
+const SERVER_URL = import.meta.env.VITE_SERVER_BASE_URL || "http://localhost:9000";
 
 export async function userAPI(endpoint, method, data = null) {
   const options = {

@@ -17,19 +17,19 @@ if (!process.env.MONGODB_URI) {
   process.exit(1);
 }
 
+const rawOrigin = process.env.Client_Base_URL;
+const allowedOrigin = rawOrigin ? rawOrigin.replace(/\/$/, "") : "http://localhost:5173";
+
 // Create Express app
 const app = express();
 
 // IMPORTANT: cookieParser must come BEFORE other middleware
 app.use(cookieParser());
 
-const allowedOrigin = process.env.Client_Base_URL.replace(/\/$/, ""); // remove trailing slash if any
-
-
 // CORS configuration - VERY IMPORTANT for cookies
 app.use(
   cors({
-    origin: allowedOrigin|| "http://localhost:5173", // Your frontend URL
+    origin: allowedOrigin, // Your frontend URL
     credentials: true, // This is crucial for cookies
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS","PATCH"],
     allowedHeaders: ["Content-Type", "Authorization"],

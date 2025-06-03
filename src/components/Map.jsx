@@ -7,23 +7,24 @@ import {
   useMap,
   useMapEvents,
 } from "react-leaflet";
-import L from 'leaflet';
+import L from "leaflet";
 
 import styles from "./Map.module.css";
 import { useEffect, useState } from "react";
 import { useCities } from "../contexts/CitiesContext";
 import { useGeolocation } from "../hooks/useGeolocation";
 import { useUrlPosition } from "../hooks/useUrlPosition";
-import { useLocation } from 'react-router-dom';
+import { useLocation } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
+
 
 import Button from "./Button";
-
 
 function getColoredMarkerIcon(color) {
   return `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-${color}.png`;
 }
 
-function mapColorFromOwner(city){
+function mapColorFromOwner(city) {
   if ((city.owners?.length || 0) > 1) return "gold";
   else if (city.owners?.[0]?.toLowerCase().includes("mark")) return "blue";
   else if (city.owners?.[0]?.toLowerCase().includes("parth")) return "green";
@@ -32,7 +33,6 @@ function mapColorFromOwner(city){
   else if (city.owners?.[0]?.toLowerCase().includes("derek")) return "orange";
   else if (city.owners?.[0]?.toLowerCase().includes("tuoyo")) return "yellow";
   else return "grey";
-
 }
 
 function Map() {
@@ -44,17 +44,18 @@ function Map() {
     getPosition,
   } = useGeolocation();
   const [mapLat, mapLng] = useUrlPosition();
+  const navigate = useNavigate();
+  const { user } = useAuth();
 
   const location = useLocation();
 
   const randomKey = Math.random();
 
-
   useEffect(
     function () {
       if (mapLat && mapLng) setMapPosition([mapLat, mapLng]);
     },
-    [mapLat, mapLng]
+    [mapLat, mapLng],
   );
 
   useEffect(
@@ -62,7 +63,7 @@ function Map() {
       if (geolocationPosition)
         setMapPosition([geolocationPosition.lat, geolocationPosition.lng]);
     },
-    [geolocationPosition]
+    [geolocationPosition],
   );
   if (!cities) cities = [];
   return (
@@ -74,7 +75,7 @@ function Map() {
       )}
 
       <MapContainer
-        {...(location.pathname === '/app/profile' ? { key: randomKey } : {})}
+        {...(location.pathname === "/app/profile" ? { key: randomKey } : {})}
         center={mapPosition}
         zoom={6}
         scrollWheelZoom={true}
@@ -85,36 +86,45 @@ function Map() {
           url="https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png"
         />
         {cities.map((city) => {
-        
-        const markerColor = mapColorFromOwner(city);
-        const customIcon = new L.Icon({
-          iconUrl: getColoredMarkerIcon(markerColor),
-          iconSize: [25, 41],
-          iconAnchor: [12, 41],
-          popupAnchor: [1, -34],
-          shadowUrl: "https://unpkg.com/leaflet@1.9.3/dist/images/marker-shadow.png"
-        });
+          const markerColor = mapColorFromOwner(city);
+          const customIcon = new L.Icon({
+            iconUrl: getColoredMarkerIcon(markerColor),
+            iconSize: [25, 41],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34],
+            shadowUrl:
+              "https://unpkg.com/leaflet@1.9.3/dist/images/marker-shadow.png",
+          });
 
-        return (
-          <Marker
-            position={[city.position.lat, city.position.lng]}
-            key={city._id}
-            icon={customIcon}
-          >
-            <Popup>
-              <span>{city.emoji}</span> <span>{city.cityName}</span>
-            </Popup>
-          </Marker>
-        );
-      })}
+          return (
+            <Marker
+              position={[city.position.lat, city.position.lng]}
+              key={city._id}
+              icon={customIcon}
+              eventHandlers={{
+              click: () => {
+                navigate(
+                  `cities/${city._id}?lat=${city.position.lat}&lng=${city.position.lng}`,
+                  city.owners?.[0] !== user.username
+                    ? { state: { visitor: city.owners?.[0] } }
+                    : undefined
+                );
+              }
+            }}
+            >
+              <Popup>
+                <span>{city.emoji}</span> <span>{city.cityName}</span>
+              </Popup>
+            </Marker>
+          );
+        })}
 
-
-                    <ChangeCenter position={mapPosition} />
-                    <DetectClick />
-                  </MapContainer>
-                </div>
-              );
-            }
+        <ChangeCenter position={mapPosition} />
+        <DetectClick />
+      </MapContainer>
+    </div>
+  );
+}
 
 function ChangeCenter({ position }) {
   const map = useMap();

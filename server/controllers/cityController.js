@@ -138,3 +138,37 @@ exports.updateCity = async (req, res) => {
     });
   }
 };
+
+exports.getGeocode = async (req, res) => {
+  try {
+    const address = req.query.address;
+    if (!address) {
+      return res.status(400).json({
+        status: "fail",
+        message: "Address is required",
+      });
+    }
+
+    const url = `${process.env.GOOGLE_GEOCODING_URI}${encodeURIComponent(address)}`;
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const data = await response.json();
+
+    if (data.status !== "OK" || !data.results || data.results.length === 0) {
+      return res.status(400).json({
+        status: "fail",
+        message: "Geocoding failed or no results found",
+      });
+    }
+
+    const { lat, lng } = data.results[0].geometry.location;
+    res.status(200).json({ lat, lng });
+  } catch (err) {
+    res.status(500).json({
+      status: "error",
+      message: err.message,
+    });
+  }
+};

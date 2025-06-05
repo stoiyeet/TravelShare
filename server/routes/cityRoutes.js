@@ -13,6 +13,8 @@ router
   .get(cityController.getAllCities)
   .post(cityController.createCity);
 
+router.get("/geocode", cityController.getGeocode);
+
 // Individual city retrieval, update & deletion
 router
   .route("/:id")

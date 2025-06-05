@@ -58,3 +58,14 @@ export async function updateCityAPI(id, updateData) {
 
   return await res.json();
 }
+
+export async function getGeocode(address) {
+  const res = await fetch(`${SERVER_URL}/api/cities/geocode?address=${encodeURIComponent(address)}`, {
+    method: "GET",
+    credentials: "include",
+  });
+
+  if (!res.ok) throw new Error("Failed to geocode address");
+
+  return await res.json();
+}

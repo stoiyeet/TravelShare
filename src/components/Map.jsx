@@ -16,6 +16,7 @@ import { useGeolocation } from "../hooks/useGeolocation";
 import { useUrlPosition } from "../hooks/useUrlPosition";
 import { useLocation } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
+import { getGeocode } from "../services/citiesService";
 
 
 import Button from "./Button";
@@ -46,10 +47,30 @@ function Map() {
   const [mapLat, mapLng] = useUrlPosition();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const [showSearch, setShowSearch] = useState(false);
+
 
   const location = useLocation();
 
   const randomKey = Math.random();
+
+  const [searchCity, setSearchCity] = useState('');
+
+  async function handleSearch(e) {
+    e.preventDefault();
+    if (!searchCity) return;
+
+    try {
+      const { lat, lng } = await getGeocode(searchCity);
+      const variance = 0.01;
+      const adjLat = lat + (Math.random() * 2 - 1) * variance;
+      const adjLng = lng + (Math.random() * 2 - 1) * variance;
+      navigate(`form?lat=${adjLat}&lng=${adjLng}`);
+    } catch (err) {
+      console.error("Error during geocoding:", err);
+      // You can add a user notification here if desired
+    }
+  }
 
   useEffect(
     function () {
@@ -58,21 +79,49 @@ function Map() {
     [mapLat, mapLng],
   );
 
-  useEffect(
-    function () {
-      if (geolocationPosition)
-        setMapPosition([geolocationPosition.lat, geolocationPosition.lng]);
-    },
-    [geolocationPosition],
-  );
-  if (!cities) cities = [];
-  return (
-    <div className={styles.mapContainer}>
+    useEffect(
+      function () {
+        if (geolocationPosition)
+          setMapPosition([geolocationPosition.lat, geolocationPosition.lng]);
+      },
+      [geolocationPosition],
+    );
+    if (!cities) cities = [];
+      return (
+      <div className={styles.mapContainer}>
+        <div className={`${styles.searchControl} ${showSearch ? styles.showSearch : ''}`}>
+    <form onSubmit={handleSearch}>
+      <input
+        type="text"
+        value={searchCity}
+        onChange={(e) => setSearchCity(e.target.value)}
+        placeholder="Search for a city"
+        className={styles.searchInput}
+        autoFocus
+      />
+      <Button
+        type="position"
+        id="searchButton"
+        onClick={(e) => {
+          if(!showSearch)
+          { 
+            e.preventDefault();
+          }
+          setShowSearch(!showSearch);
+        }}
+      >
+        {showSearch ? "Search" : "🔍"}
+      </Button>
+    </form>
+  </div>
+
+    <div className={styles.positionControls}>
       {!geolocationPosition && (
         <Button type="position" onClick={getPosition}>
           {isLoadingPosition ? "Loading..." : "Use your position"}
         </Button>
       )}
+    </div>
 
       <MapContainer
         {...(location.pathname === "/app/profile" ? { key: randomKey } : {})}

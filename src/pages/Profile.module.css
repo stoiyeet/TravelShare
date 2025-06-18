@@ -55,6 +55,25 @@
   color: var(--color-light--3);
 }
 
+.colorOptions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.colorSwatch {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: all 0.3s;
+}
+
+.colorSwatch:hover {
+  border-color: var(--color-brand--2);
+}
+
 .button {
   background-color: var(--color-brand--2);
   color: var(--color-dark--1);

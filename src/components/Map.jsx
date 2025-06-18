@@ -27,12 +27,7 @@ function getColoredMarkerIcon(color) {
 
 function mapColorFromOwner(city) {
   if ((city.owners?.length || 0) > 1) return "gold";
-  else if (city.owners?.[0]?.toLowerCase().includes("mark")) return "blue";
-  else if (city.owners?.[0]?.toLowerCase().includes("parth")) return "green";
-  else if (city.owners?.[0]?.toLowerCase().includes("damien")) return "red";
-  else if (city.owners?.[0]?.toLowerCase().includes("jad")) return "violet";
-  else if (city.owners?.[0]?.toLowerCase().includes("derek")) return "orange";
-  else if (city.owners?.[0]?.toLowerCase().includes("tuoyo")) return "yellow";
+  else if (city.owners?.length > 0) return city.owners[0].color;
   else return "grey";
 }
 

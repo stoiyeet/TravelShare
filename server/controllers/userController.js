@@ -4,7 +4,7 @@ const bcrypt = require("bcryptjs");
 
 exports.updateProfile = async (req, res) => {
   try {
-    const { username, avatar } = req.body;
+    const { username, avatar, color } = req.body;
     
     if (!username) {
       return res.status(400).json({
@@ -18,6 +18,9 @@ exports.updateProfile = async (req, res) => {
     if (avatar !== undefined) {
       user.avatar = avatar;
     }
+    if (color !== undefined) {
+      user.color = color;
+    }
     
     await user.save();
     
@@ -25,6 +28,7 @@ exports.updateProfile = async (req, res) => {
       username: user.username,
       email: user.email,
       avatar: user.avatar,
+      color: user.color,
     };
     
     res.status(200).json({
@@ -65,6 +69,17 @@ exports.updatePassword = async (req, res) => {
     });
   } catch (err) {
     console.error("Update password error:", err);
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
+};
+
+exports.getAllUsersColors = async (req, res) => {
+  try {
+    const users = await User.find({}, 'username color');
+    const colors = users.map(user => ({ username: user.username, color: user.color }));
+    res.status(200).json(colors);
+  } catch (err) {
+    console.error("Get users colors error:", err);
     res.status(500).json({ message: "Server error", error: err.message });
   }
 };

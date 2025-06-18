@@ -10,7 +10,7 @@ import { useEffect } from "react";
 
 function UserList() {
   const { cities, isLoading, fetchCities } = useCities();
-  const visitors = [...new Set(cities.flatMap(city => city.owners))];
+  const visitors = [...new Set(cities.flatMap(city => city.owners.map(owner => owner.username)))];
   const location = useLocation();
   const shouldRefresh = location.state?.refresh;
 
@@ -27,10 +27,20 @@ if (shouldRefresh) {
       <Message message="No Cities have been visited yet?" />
     );
 
+  // Create a map of username to color
+  const visitorColors = {};
+  cities.forEach(city => {
+    city.owners.forEach(owner => {
+      if (!visitorColors[owner.username]) {
+        visitorColors[owner.username] = owner.color;
+      }
+    });
+  });
+
   return (
     <ul className={styles.cityList}>
       {visitors.map((visitor) => (
-        <UserItem key={visitor} visitor={visitor} />
+        <UserItem key={visitor} visitor={visitor} color={visitorColors[visitor]} />
     ))}
     </ul>
   );

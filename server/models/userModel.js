@@ -29,6 +29,10 @@ const userSchema = new mongoose.Schema({
     type: String,
     default: "../../public/mcmaster.png",
   },
+  color: {
+    type: String,
+    default: "#aaa",
+  },
   createdAt: {
     type: Date,
     default: Date.now,

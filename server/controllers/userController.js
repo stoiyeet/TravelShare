@@ -1,4 +1,6 @@
 const User = require("../models/userModel");
+const bcrypt = require("bcryptjs");
+
 
 exports.updateProfile = async (req, res) => {
   try {

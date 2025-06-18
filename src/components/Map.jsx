@@ -22,7 +22,8 @@ import { getGeocode } from "../services/citiesService";
 import Button from "./Button";
 
 function getColoredMarkerIcon(color) {
-  return `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-${color}.png`;
+  const cleanedColor = color.replace(/^#+|#+$/g, '');
+  return `../../data/Colours/${cleanedColor}.png`;
 }
 
 function mapColorFromOwner(city) {
@@ -149,8 +150,8 @@ function Map() {
               click: () => {
                 navigate(
                   `cities/${city._id}?lat=${city.position.lat}&lng=${city.position.lng}`,
-                  city.owners?.[0] !== user.username
-                    ? { state: { visitor: city.owners?.[0] } }
+                  city.owners?.[0].username !== user.username
+                    ? { state: { visitor: city.owners?.[0].username } }
                     : undefined
                 );
               }

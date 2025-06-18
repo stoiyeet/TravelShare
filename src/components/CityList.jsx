@@ -7,9 +7,9 @@ import { useCities } from "../contexts/CitiesContext";
 function CityList({visitor}) {
   const { cities, isLoading } = useCities();
 
-    // Filter cities that belong to this visitor
+    // Filter cities that belong to this visitor'
   const userCities = cities.filter(city =>
-    Array.isArray(city.owners) && city.owners.includes(visitor)
+    Array.isArray(city.owners) && city.owners.map(o => o.username).includes(visitor)
   );
 
   if (isLoading) return <Spinner />;

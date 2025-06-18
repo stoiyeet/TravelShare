@@ -10,7 +10,7 @@ import { useEffect } from "react";
 
 function UserList() {
   const { cities, isLoading, fetchCities } = useCities();
-  const visitors = [...new Set(cities.flatMap(city => city.owners.map(owner => owner.username)))];
+  const visitors = [...new Set(cities.flatMap(city => (city.owners || []).map(owner => owner.username)))];
   const location = useLocation();
   const shouldRefresh = location.state?.refresh;
 
@@ -28,14 +28,15 @@ if (shouldRefresh) {
     );
 
   // Create a map of username to color
-  const visitorColors = {};
-  cities.forEach(city => {
-    city.owners.forEach(owner => {
-      if (!visitorColors[owner.username]) {
-        visitorColors[owner.username] = owner.color;
-      }
-    });
+ const visitorColors = {};
+cities.forEach(city => {
+  (city.owners || []).forEach(owner => {
+    if (owner?.username && !visitorColors[owner.username]) {
+      visitorColors[owner.username] = owner.color;
+    }
   });
+});
+
 
   return (
     <ul className={styles.cityList}>

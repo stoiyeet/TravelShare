@@ -4,7 +4,7 @@ const User = require('../models/userModel'); // adjust path as needed
 exports.getAllCities = async (req, res) => {
   try {
     // Step 1: Fetch all users with their usernames and locations
-    const users = await User.find({}, 'username locations');
+    const users = await User.find({}, 'username locations color');
 
     // Step 2: Map cityId => [owners]
     const cityOwnerMap = {};
@@ -15,6 +15,7 @@ exports.getAllCities = async (req, res) => {
           cityOwnerMap[idStr] = [];
         }
         cityOwnerMap[idStr].push({ username: user.username, color: user.color });
+        console.log(`User ${user.color} owns city ${idStr}`);
       }
     }
 

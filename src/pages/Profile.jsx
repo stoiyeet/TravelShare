@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
-import { userAPI } from "../services/userService";
+import { userAPI, getAvailableColours } from "../services/userService";
 import styles from "./Profile.module.css";
 
 function Profile() {
@@ -24,25 +24,29 @@ function Profile() {
   const [isLoading, setIsLoading] = useState(false);
   const [usedColors, setUsedColors] = useState([]);
   const [availableColors, setAvailableColors] = useState([]);
-  
-  const allColors = ["#3a2ef0", "#1fbf2f", "#c91a20", "#b21ee8", "#d68915", "#c4c21f", "#aaa"];
+  const [allColors, setAllColors] = useState([]);
   
   useEffect(() => {
-    async function fetchColors() {
+    async function fetchData() {
       try {
-        const data = await userAPI("colors", "GET");
-        setUsedColors(data.map(item => item.color));
+        const [colorsResponse, usedColorsData] = await Promise.all([
+          getAvailableColours(),
+          userAPI("colors", "GET")
+        ]);
+        
+        setAllColors(colorsResponse.colors);
+        setUsedColors(usedColorsData.map(item => item.color));
       } catch (err) {
-        console.error("Error fetching colors:", err);
+        console.error("Error fetching data:", err);
       }
     }
-    fetchColors();
+    fetchData();
   }, []);
   
   useEffect(() => {
     const available = allColors.filter(color => !usedColors.includes(color) || color === user.color);
     setAvailableColors(available);
-  }, [usedColors, user.color]);
+  }, [allColors, usedColors, user.color]);
 
   function handleChange(e) {
     const { name, value } = e.target;

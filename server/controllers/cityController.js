@@ -15,7 +15,6 @@ exports.getAllCities = async (req, res) => {
           cityOwnerMap[idStr] = [];
         }
         cityOwnerMap[idStr].push({ username: user.username, color: user.color });
-        console.log(`User ${user.color} owns city ${idStr}`);
       }
     }
 

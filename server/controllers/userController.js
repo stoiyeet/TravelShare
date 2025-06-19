@@ -1,5 +1,7 @@
 const User = require("../models/userModel");
 const bcrypt = require("bcryptjs");
+const fs = require("fs");
+const path = require("path");
 
 
 exports.updateProfile = async (req, res) => {
@@ -69,6 +71,26 @@ exports.updatePassword = async (req, res) => {
     });
   } catch (err) {
     console.error("Update password error:", err);
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
+};
+
+exports.getAvailableColours = async (req, res) => {
+  try {
+    // Read files from data/Colours directory
+    const coloursDir = path.join(__dirname, '../../data/Colours');    
+    const files = fs.readdirSync(coloursDir);
+    
+    // Filter for .png files and convert to hex colors
+    const allColors = files
+      .filter(file => file.endsWith('.png'))
+      .map(file => '#' + file.replace('.png', ''));
+    
+    res.status(200).json({
+      colors: allColors,
+    });
+  } catch (err) {
+    console.error("Get available colours error:", err);
     res.status(500).json({ message: "Server error", error: err.message });
   }
 };

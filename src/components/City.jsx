@@ -39,7 +39,7 @@ function City() {
     const updatedDate = formData.get("date");
     const fixedDate = new Date(updatedDate + "T12:00:00Z");
     updateCity(id, { notes: updatedNotes, date: fixedDate });
-    await setTimeout(() => {}, 1000);
+    await setTimeout(() => {}, 3000);
     fetchCities();
     window.history.replaceState({}, document.title); 
     e.target.reset();

@@ -8,9 +8,10 @@ import { useLocation } from "react-router-dom";
 import BackButton from "./BackButton";
 import BackButtonRefresh from "./BackButtonRefresh";
 
+
 function City() {
   const { id } = useParams();
-  const { getCity, currentCity, updateCity } = useCities();
+  const { getCity, currentCity, updateCity, fetchCities } = useCities();
   const { user } = useAuth();
   const [formDate, setFormDate] = useState("");
   const [formNotes, setFormNotes] = useState("");
@@ -31,13 +32,16 @@ function City() {
   const location = useLocation();
   const visitor = location.state?.visitor;
 
-  function handleUpdateVisit(e) {
+  async function handleUpdateVisit(e) {
     e.preventDefault();
     const formData = new FormData(e.target);
     const updatedNotes = formData.get("notes");
     const updatedDate = formData.get("date");
     const fixedDate = new Date(updatedDate + "T12:00:00Z");
     updateCity(id, { notes: updatedNotes, date: fixedDate });
+    await setTimeout(() => {}, 500);
+    fetchCities();
+    window.history.replaceState({}, document.title); 
     e.target.reset();
   }
 

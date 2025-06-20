@@ -20,7 +20,7 @@ exports.getAllCities = async (req, res) => {
 
     // Step 3: Fetch all cities referenced by any user
     const cityIds = Object.keys(cityOwnerMap);
-    const cities = await City.find({ _id: { $in: cityIds } }).sort({ date: -1 });
+    const cities = await City.find({ _id: { $in: cityIds } }).sort({ date: 1});
 
     // Step 4: Attach owners to each city
     const enrichedCities = cities.map(city => {

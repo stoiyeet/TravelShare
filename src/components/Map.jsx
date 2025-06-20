@@ -23,7 +23,7 @@ import Button from "./Button";
 
 function getColoredMarkerIcon(color) {
   const cleanedColor = color.replace(/^#+|#+$/g, '');
-  return `../../data/Colours/${cleanedColor}.png`;
+  return `/Colours/${cleanedColor}.png`;
 }
 
 function mapColorFromOwner(city) {

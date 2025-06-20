@@ -44,7 +44,7 @@ function Profile() {
   }, []);
   
   useEffect(() => {
-    const available = allColors.filter(color => !usedColors.includes(color) || color === user.color);
+    const available = allColors.filter(color => !usedColors.includes(color));
     setAvailableColors(available);
   }, [allColors, usedColors, user.color]);
 
@@ -150,14 +150,7 @@ function Profile() {
             </div>
             
             <div className={styles.formGroup}>
-              <label htmlFor="color">Color</label>
-              <input
-                type="color"
-                id="color"
-                name="color"
-                value={formData.color}
-                onChange={handleChange}
-              />
+              <label htmlFor="color">Color Options</label>
               <div className={styles.colorOptions}>
                 {availableColors.map(color => (
                   <div

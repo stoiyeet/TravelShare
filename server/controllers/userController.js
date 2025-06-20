@@ -78,7 +78,7 @@ exports.updatePassword = async (req, res) => {
 exports.getAvailableColours = async (req, res) => {
   try {
     // Read files from data/Colours directory
-    const coloursDir = path.join(__dirname, '../../data/Colours');    
+    const coloursDir = path.join(__dirname, '../../public/Colours');    
     const files = fs.readdirSync(coloursDir);
     
     // Filter for .png files and convert to hex colors

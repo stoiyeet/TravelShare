@@ -38,6 +38,11 @@ app.use(
 
 app.use(express.json()); // Parse JSON bodies
 
+// Basic health check route
+app.get("/", (req, res) => {
+  res.status(200).send("Server is running!");
+});
+
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/cities", cityRoutes);

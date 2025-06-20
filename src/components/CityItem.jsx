@@ -9,7 +9,7 @@ function CityItem({ city, visitor }) {
   const { deleteCity } = useCities();
   const { user } = useAuth();
 
-  const { cityName, emoji, date, _id: id, position, owners } = city;
+  const { cityName, emoji, date, _id: id, position } = city;
 
   function handleClick(e) {
     e.preventDefault();

@@ -9,7 +9,7 @@ import { useEffect } from "react";
 
 
 function UserList() {
-  const { cities, isLoading, fetchCities } = useCities();
+  const { cities, fetchCities } = useCities();
   const visitors = [...new Set(cities.flatMap(city => (city.owners || []).map(owner => owner.username)))];
   const location = useLocation();
   const shouldRefresh = location.state?.refresh;

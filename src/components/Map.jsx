@@ -22,14 +22,16 @@ import { getGeocode } from "../services/citiesService";
 import Button from "./Button";
 
 function getColoredMarkerIcon(color) {
+  if (!color){
+    color = "000";
+  };
   const cleanedColor = color.replace(/^#+|#+$/g, '');
   return `/Colours/${cleanedColor}.png`;
 }
 
-function mapColorFromOwner(city) {
-  if ((city.owners?.length || 0) > 1) return "gold";
-  else if (city.owners?.length > 0) return city.owners[0].color;
-  else return "grey";
+function mapColorFromOwner(city, user) {
+  if (city.owners?.length > 0) return city.owners[0].color;
+  else return user?.color || "000";
 }
 
 function Map() {
@@ -131,7 +133,7 @@ function Map() {
           url="https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png"
         />
         {cities.map((city) => {
-          const markerColor = mapColorFromOwner(city);
+          const markerColor = mapColorFromOwner(city, user);
           const customIcon = new L.Icon({
             iconUrl: getColoredMarkerIcon(markerColor),
             iconSize: [25, 41],

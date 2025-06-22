@@ -7,6 +7,7 @@ import { useAuth } from "../contexts/AuthContext";
 import { useLocation } from "react-router-dom";
 import BackButton from "./BackButton";
 import BackButtonRefresh from "./BackButtonRefresh";
+import { uploadCityImageAPI, deleteCityImageAPI } from "../services/citiesService";
 
 function City() {
   const { id } = useParams();
@@ -16,6 +17,9 @@ function City() {
   const [formNotes, setFormNotes] = useState("");
   const [showGallery, setShowGallery] = useState(false);
   const [galleryIndex, setGalleryIndex] = useState(0);
+  const [imageUploadLoading, setImageUploadLoading] = useState(false);
+  const [imageDeleteLoading, setImageDeleteLoading] = useState(false);
+  const [imageError, setImageError] = useState("");
   // Use images from currentCity if available, otherwise empty array
   const galleryImages = currentCity?.images && Array.isArray(currentCity.images) && currentCity.images.length > 0
     ? currentCity.images
@@ -49,6 +53,39 @@ function City() {
     e.target.reset();
   }
 
+  // Handler for uploading images
+  async function handleAddImages(e) {
+    const files = Array.from(e.target.files);
+    if (!files.length) return;
+    setImageUploadLoading(true);
+    setImageError("");
+    try {
+      for (const file of files) {
+        await uploadCityImageAPI(id, file);
+      }
+      await getCity(id); // Refresh city data
+    } catch (err) {
+      setImageError("Failed to upload image(s). Please try again.");
+    } finally {
+      setImageUploadLoading(false);
+      e.target.value = "";
+    }
+  }
+
+  // Handler for deleting an image
+  async function handleDeleteImage(imageUrl) {
+    setImageDeleteLoading(true);
+    setImageError("");
+    try {
+      await deleteCityImageAPI(id, imageUrl);
+      await getCity(id); // Refresh city data
+    } catch (err) {
+      setImageError("Failed to delete image. Please try again.");
+    } finally {
+      setImageDeleteLoading(false);
+    }
+  }
+
   const isOwner = visitor === user?.username;
 
   return (
@@ -58,15 +95,31 @@ function City() {
         <h3 style={{display: 'flex', alignItems: 'center', gap: '1rem'}}>
           <span>{emoji}</span>
           <span><h3>{cityName}</h3></span>
-          <button
-          className={styles.button}
-            onClick={() => setShowGallery(true)}
-          >
-            Browse Pictures
-          </button>
+          {galleryImages.length > 0 && (
+            <button
+              className={styles.button}
+              onClick={() => setShowGallery(true)}
+            >
+              Browse Pictures
+            </button>
+          )}
         </h3>
       </div>
-
+      {isOwner && (
+        <div className={styles.row} style={{marginBottom: 16}}>
+          <label htmlFor="add-images" style={{marginRight: 8}}>Add Images:</label>
+          <input
+            id="add-images"
+            type="file"
+            accept="image/*"
+            multiple
+            onChange={handleAddImages}
+            disabled={imageUploadLoading}
+          />
+          {imageUploadLoading && <span style={{ color: '#888', marginLeft: 8 }}>Uploading...</span>}
+        </div>
+      )}
+      {imageError && <div style={{ color: 'red', marginBottom: 8 }}>{imageError}</div>}
       {showGallery ? (
         <div style={{
           display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: 350, margin: '2rem 0', position: 'relative'
@@ -84,11 +137,24 @@ function City() {
             </button>
             <div className={styles.galleryImages}>
               {galleryImages.length > 0 ? (
-                <img
-                  className={styles.centerCropped}
-                  src={galleryImages[galleryIndex]}
-                  alt={`Gallery ${galleryIndex+1}`}
-                />
+                <div style={{ position: 'relative' }}>
+                  <img
+                    className={styles.centerCropped}
+                    src={galleryImages[galleryIndex]}
+                    alt={`Gallery ${galleryIndex+1}`}
+                  />
+                  {isOwner && (
+                    <button
+                      onClick={() => handleDeleteImage(galleryImages[galleryIndex])}
+                      style={{
+                        position: 'absolute', top: 8, right: 8, background: 'rgba(255,0,0,0.8)', color: '#fff', border: 'none', borderRadius: 4, padding: '2px 8px', cursor: 'pointer', zIndex: 2
+                      }}
+                      disabled={imageDeleteLoading}
+                    >
+                      Delete
+                    </button>
+                  )}
+                </div>
               ) : (
                 <span style={{ color: '#fff', padding: 32 }}>No images available for this city.</span>
               )}

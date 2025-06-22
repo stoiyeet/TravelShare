@@ -162,6 +162,8 @@ exports.deleteCityImage = async (req, res) => {
     const cityId = req.params.id;
     const imageUrl = req.body.imageUrl;
 
+    console.log(`Delete request received for city ${cityId}, image URL: ${imageUrl}`);
+
     if (!imageUrl) {
       return res.status(400).json({ status: 'fail', message: 'Image URL is required' });
     }
@@ -226,16 +228,12 @@ exports.getAllCities = async (req, res) => {
 
     // Step 3: Fetch ALL cities (not just those referenced by users)
     const cities = await City.find({}).sort({ date: 1});
-    console.log(`Found ${cities.length} total cities in database`);
-
     // Step 4: Attach owners to each city (empty array if no owners)
     const enrichedCities = cities.map(city => {
       const cityObj = city.toObject(); // convert to plain JS object
       cityObj.owners = cityOwnerMap[city._id.toString()] || [];
       return cityObj;
     });
-
-    console.log(`Returning ${enrichedCities.length} enriched cities`);
     res.status(200).json(enrichedCities);
   } catch (err) {
     console.error('Error in getAllCities:', err);

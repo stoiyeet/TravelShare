@@ -15,24 +15,6 @@ export async function uploadCityImageAPI(cityId, file) {
   return await res.json();
 }
 
-export async function uploadCityImagesAPI(cityId, files) {
-  const formData = new FormData();
-  
-  // Append multiple files
-  for (let i = 0; i < files.length; i++) {
-    formData.append("files", files[i]);
-  }
-
-  const res = await fetch(`${SERVER_URL}/api/cities/${cityId}/uploadImages`, {
-    method: "POST",
-    body: formData,
-    credentials: "include",
-  });
-
-  if (!res.ok) throw new Error("Failed to upload images");
-  return await res.json();
-}
-
 export async function deleteCityImageAPI(cityId, imageUrl) {
   const res = await fetch(`${SERVER_URL}/api/cities/${cityId}/deleteImage`, {
     method: "DELETE",

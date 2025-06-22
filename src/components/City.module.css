@@ -91,7 +91,8 @@ input[type="text"]::placeholder {
 
 
 .saveBtn:hover {
-  background-color: var(--color-brand--2);
+  background-color: #000;
+  transform: scale(1.05);
 }
 
 .button {
@@ -142,4 +143,34 @@ input[type="text"]::placeholder {
     object-position: center;
     height: 100%;
     width: 100%
+}
+
+.uploadImagesButton {
+  cursor: pointer;
+  background-color: var(--color-brand--1);
+  color: #fff;
+  padding: 8px 16px;
+  border-radius: 10px;
+  font-weight: bold;
+  user-select: none;
+
+  display: inline-flex;
+  align-items: center;       /* vertical center */
+  justify-content: center;   /* horizontal center */
+  
+  height: 40px;              /* fixed height for consistent size */
+  min-width: 100px;          /* min width, adjust as needed */
+  max-width: 140px;
+
+  transition: 
+    background-color 0.3s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.uploadImagesButton:hover {
+  background-color: #000;
+  cursor: pointer;
+  transform: scale(1.05);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
 }

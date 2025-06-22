@@ -47,7 +47,6 @@ function City() {
     const updatedDate = formData.get("date");
     const fixedDate = new Date(updatedDate + "T12:00:00Z");
     updateCity(id, { notes: updatedNotes, date: fixedDate });
-    await setTimeout(() => {}, 3000);
     fetchCities();
     window.history.replaceState({}, document.title); 
     e.target.reset();
@@ -107,7 +106,12 @@ function City() {
       </div>
       {isOwner && (
         <div className={styles.row} style={{marginBottom: 16}}>
-          <label htmlFor="add-images" style={{marginRight: 8}}>Add Images:</label>
+          <label
+            htmlFor="add-images"
+            className={styles.uploadImagesButton}
+          >
+            Add Images
+          </label>
           <input
             id="add-images"
             type="file"
@@ -115,7 +119,9 @@ function City() {
             multiple
             onChange={handleAddImages}
             disabled={imageUploadLoading}
+            style={{ display: 'none' }}
           />
+
           {imageUploadLoading && <span style={{ color: '#888', marginLeft: 8 }}>Uploading...</span>}
         </div>
       )}

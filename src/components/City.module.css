@@ -111,8 +111,7 @@ input[type="text"]::placeholder {
 .galleryImages {
   background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
   width: 100%;
-  max-width: 600px;
-  min-height: 300px;
+  min-width: 230px;;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -138,48 +137,9 @@ input[type="text"]::placeholder {
 }
 
 
-/* Portrait smartphone photos */
-.galleryImages.portrait {
-  aspect-ratio: 3 / 4;
-  max-height: 500px;
-}
-
-/* Landscape photos */
-.galleryImages.landscape {
-  aspect-ratio: 4 / 3;
-}
-
-/* Wide landscape */
-.galleryImages.wide {
-  aspect-ratio: 16 / 9;
-}
-
-/* Auto-detect orientation and apply optimal sizing */
-.galleryImages.auto {
-  min-height: 250px;
-  max-height: 600px;
-}
-
-/* Focus ring for accessibility */
-.galleryImages:focus-visible {
-  outline: 3px solid rgba(59, 130, 246, 0.6);
-  outline-offset: 2px;
-}
-
-/* Reduced motion for users who prefer it */
-@media (prefers-reduced-motion: reduce) {
-  .galleryImages,
-  .galleryImages img,
-  .galleryImages::before {
-    transition: none;
-    animation: none;
-  }
-  
-  .galleryImages:hover {
-    transform: none;
-  }
-  
-  .galleryImages:hover img {
-    transform: none;
-  }
+.centerCropped {
+    object-fit: cover;
+    object-position: center;
+    height: 100%;
+    width: 100%
 }

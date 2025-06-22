@@ -87,9 +87,9 @@ function City() {
             </button>
             <div className={styles.galleryImages}>
               <img
+                className={styles.centerCropped}
                 src={galleryImages[galleryIndex]}
                 alt={`Gallery ${galleryIndex+1}`}
-                style={{maxWidth: '100%', maxHeight: '100%', objectFit: 'contain', background: '#000', display: 'block'}}
               />
             </div>
             <button

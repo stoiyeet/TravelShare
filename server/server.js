@@ -2,15 +2,16 @@ const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
 const cookieParser = require("cookie-parser");
-
-const cityRoutes = require("./routes/cityRoutes");
 const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
 const connectDB = require("./connections/mongoDB");
 
-// Load environment variables
 dotenv.config();
+const cityRoutes = require("./routes/cityRoutes");
 
+
+
+// Load environment variables
 // Check required environment variable
 if (!process.env.MONGODB_URI) {
   console.error("❌ MONGODB_URI is not defined in .env");

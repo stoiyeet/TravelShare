@@ -5,28 +5,49 @@ const multer = require('multer');
 
 // Multer setup for file parsing
 const storage = multer.memoryStorage();
-const upload = multer({ storage });
+const upload = multer({ 
+  storage,
+  limits: {
+    fileSize: 10 * 1024 * 1024, // 10MB limit
+  },
+  fileFilter: (req, file, cb) => {
+    // Accept only image files
+    if (file.mimetype.startsWith('image/')) {
+      cb(null, true);
+    } else {
+      cb(new Error('Only image files are allowed!'), false);
+    }
+  }
+});
+
+console.log("myendpoint ", process.env.CLOUDFLARE_R2_ENDPOINT);
 
 // Configure AWS SDK for R2 (S3-compatible)
 const s3 = new AWS.S3({
-  endpoint: process.env.CLOUDFLARE_R2_ENDPOINT,
+  endpoint: new AWS.Endpoint(process.env.CLOUDFLARE_R2_ENDPOINT),
   accessKeyId: process.env.CLOUDFLARE_R2_ACCESS_KEY_ID,
   secretAccessKey: process.env.CLOUDFLARE_R2_SECRET_ACCESS_KEY,
-  signatureVersion: 'v4', // important for R2
+  signatureVersion: 'v4',
   region: 'auto'
 });
 
+// Single file upload
 exports.uploadCityImage = [
-  upload.single('image'),
+  upload.single('file'), // Changed from 'image' to 'file' to match frontend
   async (req, res) => {
     try {
       const cityId = req.params.id;
       const file = req.file;
+      
+      console.log('Upload request received for city:', cityId);
+      console.log('File received:', file ? file.originalname : 'No file');
+      
       if (!file) {
         return res.status(400).json({ status: 'fail', message: 'No file uploaded' });
       }
 
       const key = `${cityId}/${Date.now()}_${file.originalname}`;
+      console.log('Uploading to R2 with key:', key);
 
       const uploadParams = {
         Bucket: process.env.CLOUDFLARE_R2_BUCKET,
@@ -36,10 +57,11 @@ exports.uploadCityImage = [
         ACL: 'public-read' // R2 respects this when bucket is public
       };
 
-      await s3.upload(uploadParams).promise();
+      const uploadResult = await s3.upload(uploadParams).promise();
+      console.log('R2 upload successful:', uploadResult.Location);
 
       const fileUrl = `${process.env.CLOUDFLARE_R2_PUBLIC_URL}/${key}`;
-
+      console.log('Public URL:', fileUrl);
 
       // Update City document to add this image
       const updatedCity = await City.findByIdAndUpdate(
@@ -49,12 +71,87 @@ exports.uploadCityImage = [
       );
 
       if (!updatedCity) {
+        console.log('City not found with ID:', cityId);
         return res.status(404).json({ status: 'fail', message: 'City not found' });
       }
 
+      console.log('City updated successfully with new image');
       res.status(200).json({ status: 'success', data: updatedCity });
     } catch (err) {
-      console.error(err);
+      console.error('Upload error:', err);
+      res.status(500).json({ status: 'error', message: err.message });
+    }
+  }
+];
+
+// Multiple files upload
+exports.uploadCityImages = [
+  upload.array('files', 10), // Allow up to 10 files
+  async (req, res) => {
+    try {
+      const cityId = req.params.id;
+      const files = req.files;
+      
+      console.log('Multiple upload request received for city:', cityId);
+      console.log('Files received:', files ? files.length : 0);
+      
+      if (!files || files.length === 0) {
+        return res.status(400).json({ status: 'fail', message: 'No files uploaded' });
+      }
+
+      const uploadPromises = [];
+      const fileUrls = [];
+
+      // Process each file
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const key = `${cityId}/${Date.now()}_${i}_${file.originalname}`;
+        
+        console.log(`Processing file ${i + 1}/${files.length}: ${file.originalname}`);
+
+        const uploadParams = {
+          Bucket: process.env.CLOUDFLARE_R2_BUCKET,
+          Key: key,
+          Body: file.buffer,
+          ContentType: file.mimetype,
+          ACL: 'public-read'
+        };
+
+        const uploadPromise = s3.upload(uploadParams).promise().then(() => {
+          const fileUrl = `${process.env.CLOUDFLARE_R2_PUBLIC_URL}/${key}`;
+          fileUrls.push(fileUrl);
+          console.log(`File ${i + 1} uploaded successfully: ${fileUrl}`);
+          return fileUrl;
+        });
+
+        uploadPromises.push(uploadPromise);
+      }
+
+      // Wait for all uploads to complete
+      await Promise.all(uploadPromises);
+      console.log('All files uploaded successfully');
+
+      // Update City document to add all images
+      const updatedCity = await City.findByIdAndUpdate(
+        cityId,
+        { $push: { images: { $each: fileUrls } } },
+        { new: true, runValidators: true }
+      );
+
+      if (!updatedCity) {
+        console.log('City not found with ID:', cityId);
+        return res.status(404).json({ status: 'fail', message: 'City not found' });
+      }
+
+      console.log('City updated successfully with', fileUrls.length, 'new images');
+      res.status(200).json({ 
+        status: 'success', 
+        data: updatedCity,
+        uploadedCount: fileUrls.length,
+        uploadedUrls: fileUrls
+      });
+    } catch (err) {
+      console.error('Multiple upload error:', err);
       res.status(500).json({ status: 'error', message: err.message });
     }
   }
@@ -78,19 +175,21 @@ exports.getAllCities = async (req, res) => {
       }
     }
 
-    // Step 3: Fetch all cities referenced by any user
-    const cityIds = Object.keys(cityOwnerMap);
-    const cities = await City.find({ _id: { $in: cityIds } }).sort({ date: 1});
+    // Step 3: Fetch ALL cities (not just those referenced by users)
+    const cities = await City.find({}).sort({ date: 1});
+    console.log(`Found ${cities.length} total cities in database`);
 
-    // Step 4: Attach owners to each city
+    // Step 4: Attach owners to each city (empty array if no owners)
     const enrichedCities = cities.map(city => {
       const cityObj = city.toObject(); // convert to plain JS object
       cityObj.owners = cityOwnerMap[city._id.toString()] || [];
       return cityObj;
     });
 
+    console.log(`Returning ${enrichedCities.length} enriched cities`);
     res.status(200).json(enrichedCities);
   } catch (err) {
+    console.error('Error in getAllCities:', err);
     res.status(500).json({
       status: "error",
       message: err.message,

@@ -1,6 +1,7 @@
 const SERVER_URL = import.meta.env.VITE_SERVER_BASE_URL || "http://localhost:9000";
 
 export async function uploadCityImageAPI(cityId, file) {
+  console.log("Uploading image for city:", cityId);
   const formData = new FormData();
   formData.append("file", file);
 
@@ -11,6 +12,24 @@ export async function uploadCityImageAPI(cityId, file) {
   });
 
   if (!res.ok) throw new Error("Failed to upload image");
+  return await res.json();
+}
+
+export async function uploadCityImagesAPI(cityId, files) {
+  const formData = new FormData();
+  
+  // Append multiple files
+  for (let i = 0; i < files.length; i++) {
+    formData.append("files", files[i]);
+  }
+
+  const res = await fetch(`${SERVER_URL}/api/cities/${cityId}/uploadImages`, {
+    method: "POST",
+    body: formData,
+    credentials: "include",
+  });
+
+  if (!res.ok) throw new Error("Failed to upload images");
   return await res.json();
 }
 

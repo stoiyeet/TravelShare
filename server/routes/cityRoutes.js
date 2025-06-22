@@ -23,6 +23,7 @@ router
   .delete(cityController.deleteCity);
 
 router.post('/:id/uploadImage', cityController.uploadCityImage);
+router.post('/:id/uploadImages', cityController.uploadCityImages);
 
 
 module.exports = router;

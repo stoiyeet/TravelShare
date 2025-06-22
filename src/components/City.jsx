@@ -16,14 +16,10 @@ function City() {
   const [formNotes, setFormNotes] = useState("");
   const [showGallery, setShowGallery] = useState(false);
   const [galleryIndex, setGalleryIndex] = useState(0);
-  const galleryImages = [
-    '/IMG_1332.jpg',
-    '/IMG_1311.jpg',
-    '/IMG_1411.jpg',
-    '/IMG_1410.jpg',
-    '/IMG_1325.jpg',
-
-  ];
+  // Use images from currentCity if available, otherwise empty array
+  const galleryImages = currentCity?.images && Array.isArray(currentCity.images) && currentCity.images.length > 0
+    ? currentCity.images
+    : [];
 
   useEffect(() => {
     getCity(id);
@@ -82,15 +78,20 @@ function City() {
                 background: 'rgba(0,0,0,0.7)', color: '#fff', border: 'none', borderRadius: '50%', width: 40, height: 40, fontSize: 24, cursor: 'pointer', marginRight: 16
               }}
               aria-label="Previous image"
+              disabled={galleryImages.length === 0}
             >
               &#8592;
             </button>
             <div className={styles.galleryImages}>
-              <img
-                className={styles.centerCropped}
-                src={galleryImages[galleryIndex]}
-                alt={`Gallery ${galleryIndex+1}`}
-              />
+              {galleryImages.length > 0 ? (
+                <img
+                  className={styles.centerCropped}
+                  src={galleryImages[galleryIndex]}
+                  alt={`Gallery ${galleryIndex+1}`}
+                />
+              ) : (
+                <span style={{ color: '#fff', padding: 32 }}>No images available for this city.</span>
+              )}
             </div>
             <button
               onClick={() => setGalleryIndex((galleryIndex + 1) % galleryImages.length)}
@@ -98,12 +99,13 @@ function City() {
                 background: 'rgba(0,0,0,0.7)', color: '#fff', border: 'none', borderRadius: '50%', width: 40, height: 40, fontSize: 24, cursor: 'pointer', marginLeft: 16
               }}
               aria-label="Next image"
+              disabled={galleryImages.length === 0}
             >
               &#8594;
             </button>
           </div>
           <div style={{marginTop: 16, color: '#fff', fontWeight: 500}}>
-            {galleryIndex + 1} / {galleryImages.length}
+            {galleryImages.length > 0 ? `${galleryIndex + 1} / ${galleryImages.length}` : '0 / 0'}
           </div>
           <button
             onClick={() => setShowGallery(false)}

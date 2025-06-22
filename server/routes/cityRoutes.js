@@ -24,6 +24,8 @@ router
 
 router.post('/:id/uploadImage', cityController.uploadCityImage);
 router.post('/:id/uploadImages', cityController.uploadCityImages);
+router.delete('/:id/deleteImage', cityController.deleteCityImage);
+
 
 
 module.exports = router;

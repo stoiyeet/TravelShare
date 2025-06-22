@@ -157,6 +157,55 @@ exports.uploadCityImages = [
   }
 ];
 
+exports.deleteCityImage = async (req, res) => {
+  try {
+    const cityId = req.params.id;
+    const imageUrl = req.body.imageUrl;
+
+    if (!imageUrl) {
+      return res.status(400).json({ status: 'fail', message: 'Image URL is required' });
+    }
+
+    console.log(`Request to delete image from city ${cityId}: ${imageUrl}`);
+
+    // Extract the key from the public URL
+    const publicUrlPrefix = `${process.env.CLOUDFLARE_R2_PUBLIC_URL}/`;
+    if (!imageUrl.startsWith(publicUrlPrefix)) {
+      return res.status(400).json({ status: 'fail', message: 'Invalid image URL' });
+    }
+    const key = imageUrl.replace(publicUrlPrefix, '');
+
+    // Delete the object from R2
+    await s3
+      .deleteObject({
+        Bucket: process.env.CLOUDFLARE_R2_BUCKET,
+        Key: key,
+      })
+      .promise();
+
+    console.log('Image deleted from R2:', key);
+
+    // Remove the image URL from the City's images array
+    const updatedCity = await City.findByIdAndUpdate(
+      cityId,
+      { $pull: { images: imageUrl } },
+      { new: true }
+    );
+
+    if (!updatedCity) {
+      console.log('City not found with ID:', cityId);
+      return res.status(404).json({ status: 'fail', message: 'City not found' });
+    }
+
+    console.log('City updated, image removed from DB.');
+    res.status(200).json({ status: 'success', data: updatedCity });
+  } catch (err) {
+    console.error('Delete image error:', err);
+    res.status(500).json({ status: 'error', message: err.message });
+  }
+};
+
+
 
 exports.getAllCities = async (req, res) => {
   try {

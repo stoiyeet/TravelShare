@@ -33,6 +33,21 @@ export async function uploadCityImagesAPI(cityId, files) {
   return await res.json();
 }
 
+export async function deleteCityImageAPI(cityId, imageUrl) {
+  const res = await fetch(`${SERVER_URL}/api/cities/${cityId}/deleteImage`, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    credentials: "include",
+    body: JSON.stringify({ imageUrl }),
+  });
+
+  if (!res.ok) throw new Error("Failed to delete image");
+  return await res.json();
+}
+
+
 export async function fetchCitiesAPI() {
   const res = await fetch(`${SERVER_URL}/api/cities`, {
     method: "GET",

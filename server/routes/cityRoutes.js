@@ -22,4 +22,7 @@ router
   .patch(cityController.updateCity)
   .delete(cityController.deleteCity);
 
+router.post('/:id/uploadImage', cityController.uploadCityImage);
+
+
 module.exports = router;

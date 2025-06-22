@@ -30,6 +30,12 @@ const citySchema = new mongoose.Schema({
       required: [true, "A city must have a longitude"],
     },
   },
+  images: [
+    {
+      type: String,
+      default: [],
+    },
+  ],
 });
 
 const City = mongoose.model("City", citySchema);

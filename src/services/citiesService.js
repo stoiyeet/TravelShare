@@ -1,5 +1,19 @@
 const SERVER_URL = import.meta.env.VITE_SERVER_BASE_URL || "http://localhost:9000";
 
+export async function uploadCityImageAPI(cityId, file) {
+  const formData = new FormData();
+  formData.append("file", file);
+
+  const res = await fetch(`${SERVER_URL}/api/cities/${cityId}/uploadImage`, {
+    method: "POST",
+    body: formData,
+    credentials: "include",
+  });
+
+  if (!res.ok) throw new Error("Failed to upload image");
+  return await res.json();
+}
+
 export async function fetchCitiesAPI() {
   const res = await fetch(`${SERVER_URL}/api/cities`, {
     method: "GET",

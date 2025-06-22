@@ -13,6 +13,7 @@ import Message from "./Message";
 import Spinner from "./Spinner";
 import { useCities } from "../contexts/CitiesContext";
 import { useNavigate } from "react-router-dom";
+import { uploadCityImageAPI } from "../services/citiesService";
 
 export function convertToEmoji(countryCode) {
   const codePoints = countryCode
@@ -36,6 +37,10 @@ function Form() {
   const [notes, setNotes] = useState("");
   const [emoji, setEmoji] = useState("");
   const [geocodingError, setGeocodingError] = useState("");
+  const [selectedFiles, setSelectedFiles] = useState([]);
+  const [uploading, setUploading] = useState(false);
+  const [uploadSuccess, setUploadSuccess] = useState(false);
+  const [uploadError, setUploadError] = useState("");
 
   useEffect(
     function () {
@@ -70,6 +75,23 @@ function Form() {
     [lat, lng]
   );
 
+  async function handleImageUpload(cityId) {
+    setUploading(true);
+    setUploadSuccess(false);
+    setUploadError("");
+    try {
+      for (const file of selectedFiles) {
+        await uploadCityImageAPI(cityId, file);
+      }
+      setUploadSuccess(true);
+      setSelectedFiles([]);
+    } catch (err) {
+      setUploadError("Failed to upload image(s). Please try again.");
+    } finally {
+      setUploading(false);
+    }
+  }
+
   async function handleSubmit(e) {
     e.preventDefault();
 
@@ -84,7 +106,11 @@ function Form() {
       position: { lat, lng },
     };
 
-    await createCity(newCity);
+    const created = await createCity(newCity);
+    // If city creation returns the new city with an id, upload images
+    if (created && created._id && selectedFiles.length > 0) {
+      await handleImageUpload(created._id);
+    }
     navigate("/app/cities", { state: { refresh: true } });
   }
 
@@ -128,6 +154,31 @@ function Form() {
           onChange={(e) => setNotes(e.target.value)}
           value={notes}
         />
+      </div>
+
+      <div className={styles.row}>
+        <label htmlFor="images">Upload image(s) for your trip (optional)</label>
+        <input
+          id="images"
+          type="file"
+          accept="image/*"
+          multiple
+          onChange={(e) => setSelectedFiles(Array.from(e.target.files))}
+          disabled={uploading}
+        />
+        {uploading && (
+          <span style={{ color: "#888", marginTop: 4 }}>
+            Uploading images...
+          </span>
+        )}
+        {uploadSuccess && (
+          <span style={{ color: "green", marginTop: 4 }}>
+            Images uploaded successfully!
+          </span>
+        )}
+        {uploadError && (
+          <span style={{ color: "red", marginTop: 4 }}>{uploadError}</span>
+        )}
       </div>
 
       <div className={styles.buttons}>

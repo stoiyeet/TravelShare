@@ -1,5 +1,65 @@
 const City = require("../models/cityModel");
-const User = require('../models/userModel'); // adjust path as needed
+const User = require('../models/userModel');
+const AWS = require('aws-sdk');
+const multer = require('multer');
+
+// Multer setup for file parsing
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
+
+// Configure AWS SDK for R2 (S3-compatible)
+const s3 = new AWS.S3({
+  endpoint: process.env.CLOUDFLARE_R2_ENDPOINT,
+  accessKeyId: process.env.CLOUDFLARE_R2_ACCESS_KEY_ID,
+  secretAccessKey: process.env.CLOUDFLARE_R2_SECRET_ACCESS_KEY,
+  signatureVersion: 'v4', // important for R2
+  region: 'auto'
+});
+
+exports.uploadCityImage = [
+  upload.single('image'),
+  async (req, res) => {
+    try {
+      const cityId = req.params.id;
+      const file = req.file;
+      if (!file) {
+        return res.status(400).json({ status: 'fail', message: 'No file uploaded' });
+      }
+
+      const key = `${cityId}/${Date.now()}_${file.originalname}`;
+
+      const uploadParams = {
+        Bucket: process.env.CLOUDFLARE_R2_BUCKET,
+        Key: key,
+        Body: file.buffer,
+        ContentType: file.mimetype,
+        ACL: 'public-read' // R2 respects this when bucket is public
+      };
+
+      await s3.upload(uploadParams).promise();
+
+      const fileUrl = `${process.env.CLOUDFLARE_R2_PUBLIC_URL}/${key}`;
+
+
+      // Update City document to add this image
+      const updatedCity = await City.findByIdAndUpdate(
+        cityId,
+        { $push: { images: fileUrl } },
+        { new: true, runValidators: true }
+      );
+
+      if (!updatedCity) {
+        return res.status(404).json({ status: 'fail', message: 'City not found' });
+      }
+
+      res.status(200).json({ status: 'success', data: updatedCity });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ status: 'error', message: err.message });
+    }
+  }
+];
+
 
 exports.getAllCities = async (req, res) => {
   try {

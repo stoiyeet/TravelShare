@@ -136,20 +136,23 @@ function CitiesProvider({ children }) {
     [user]
   );
 
-  async function createCity(newCity) {
-    if (!user) return;
-    dispatch({ type: "loading" });
+async function createCity(newCity) {
+  if (!user) return;
+  dispatch({ type: "loading" });
 
-    try {
-      const data = await createCityAPI(newCity);
-      dispatch({ type: "city/created", payload: data });
-    } catch {
-      dispatch({
-        type: "rejected",
-        payload: "There was an error creating the city...",
-      });
-    }
+  try {
+    const data = await createCityAPI(newCity);
+    dispatch({ type: "city/created", payload: data });
+    return data;
+  } catch {
+    dispatch({
+      type: "rejected",
+      payload: "There was an error creating the city...",
+    });
+    return null;
   }
+}
+
 
   async function deleteCity(id) {
     if (!user) return;

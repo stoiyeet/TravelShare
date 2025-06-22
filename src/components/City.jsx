@@ -105,81 +105,83 @@ function City() {
           )}
         </h3>
       </div>
-      {isOwner && (
-        <div className={styles.row} style={{marginBottom: 16}}>
-          <label htmlFor="add-images" style={{marginRight: 8}}>Add Images:</label>
-          <input
-            id="add-images"
-            type="file"
-            accept="image/*"
-            multiple
-            onChange={handleAddImages}
-            disabled={imageUploadLoading}
-          />
-          {imageUploadLoading && <span style={{ color: '#888', marginLeft: 8 }}>Uploading...</span>}
-        </div>
-      )}
       {imageError && <div style={{ color: 'red', marginBottom: 8 }}>{imageError}</div>}
       {showGallery ? (
-        <div style={{
-          display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: 350, margin: '2rem 0', position: 'relative'
-        }}>
-          <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 24}}>
-            <button
-              onClick={() => setGalleryIndex((galleryIndex - 1 + galleryImages.length) % galleryImages.length)}
-              style={{
-                background: 'rgba(0,0,0,0.7)', color: '#fff', border: 'none', borderRadius: '50%', width: 40, height: 40, fontSize: 24, cursor: 'pointer', marginRight: 16
-              }}
-              aria-label="Previous image"
-              disabled={galleryImages.length === 0}
-            >
-              &#8592;
-            </button>
-            <div className={styles.galleryImages}>
-              {galleryImages.length > 0 ? (
-                <div style={{ position: 'relative' }}>
-                  <img
-                    className={styles.centerCropped}
-                    src={galleryImages[galleryIndex]}
-                    alt={`Gallery ${galleryIndex+1}`}
-                  />
-                  {isOwner && (
-                    <button
-                      onClick={() => handleDeleteImage(galleryImages[galleryIndex])}
-                      style={{
-                        position: 'absolute', top: 8, right: 8, background: 'rgba(255,0,0,0.8)', color: '#fff', border: 'none', borderRadius: 4, padding: '2px 8px', cursor: 'pointer', zIndex: 2
-                      }}
-                      disabled={imageDeleteLoading}
-                    >
-                      Delete
-                    </button>
-                  )}
-                </div>
-              ) : (
-                <span style={{ color: '#fff', padding: 32 }}>No images available for this city.</span>
-              )}
+        <>
+          {isOwner && (
+            <div className={styles.row} style={{marginBottom: 16}}>
+              <label htmlFor="add-images" style={{marginRight: 8}}>Add Images:</label>
+              <input
+                id="add-images"
+                type="file"
+                accept="image/*"
+                multiple
+                onChange={handleAddImages}
+                disabled={imageUploadLoading}
+              />
+              {imageUploadLoading && <span style={{ color: '#888', marginLeft: 8 }}>Uploading...</span>}
+            </div>
+          )}
+          <div style={{
+            display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: 350, margin: '2rem 0', position: 'relative'
+          }}>
+            <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 24}}>
+              <button
+                onClick={() => setGalleryIndex((galleryIndex - 1 + galleryImages.length) % galleryImages.length)}
+                style={{
+                  background: 'rgba(0,0,0,0.7)', color: '#fff', border: 'none', borderRadius: '50%', width: 40, height: 40, fontSize: 24, cursor: 'pointer', marginRight: 16
+                }}
+                aria-label="Previous image"
+                disabled={galleryImages.length === 0}
+              >
+                &#8592;
+              </button>
+              <div className={styles.galleryImages}>
+                {galleryImages.length > 0 ? (
+                  <div style={{ position: 'relative' }}>
+                    <img
+                      className={styles.centerCropped}
+                      src={galleryImages[galleryIndex]}
+                      alt={`Gallery ${galleryIndex+1}`}
+                    />
+                    {isOwner && (
+                      <button
+                        onClick={() => handleDeleteImage(galleryImages[galleryIndex])}
+                        style={{
+                          position: 'absolute', top: 8, right: 8, background: 'rgba(255,0,0,0.8)', color: '#fff', border: 'none', borderRadius: 4, padding: '2px 8px', cursor: 'pointer', zIndex: 2
+                        }}
+                        disabled={imageDeleteLoading}
+                      >
+                        Delete
+                      </button>
+                    )}
+                  </div>
+                ) : (
+                  <span style={{ color: '#fff', padding: 32 }}>No images available for this city.</span>
+                )}
+              </div>
+              <button
+                onClick={() => setGalleryIndex((galleryIndex + 1) % galleryImages.length)}
+                style={{
+                  background: 'rgba(0,0,0,0.7)', color: '#fff', border: 'none', borderRadius: '50%', width: 40, height: 40, fontSize: 24, cursor: 'pointer', marginLeft: 16
+                }}
+                aria-label="Next image"
+                disabled={galleryImages.length === 0}
+              >
+                &#8594;
+              </button>
+            </div>
+            <div style={{marginTop: 16, color: '#fff', fontWeight: 500}}>
+              {galleryImages.length > 0 ? `${galleryIndex + 1} / ${galleryImages.length}` : '0 / 0'}
             </div>
             <button
-              onClick={() => setGalleryIndex((galleryIndex + 1) % galleryImages.length)}
-              style={{
-                background: 'rgba(0,0,0,0.7)', color: '#fff', border: 'none', borderRadius: '50%', width: 40, height: 40, fontSize: 24, cursor: 'pointer', marginLeft: 16
-              }}
-              aria-label="Next image"
-              disabled={galleryImages.length === 0}
+              onClick={() => setShowGallery(false)}
+              style={{marginTop: 24, background: '#fff', color: '#222', border: 'none', borderRadius: 6, padding: '0.4rem 1.2rem', fontWeight: 600, fontSize: '1rem', cursor: 'pointer'}}
             >
-              &#8594;
+              Close
             </button>
           </div>
-          <div style={{marginTop: 16, color: '#fff', fontWeight: 500}}>
-            {galleryImages.length > 0 ? `${galleryIndex + 1} / ${galleryImages.length}` : '0 / 0'}
-          </div>
-          <button
-            onClick={() => setShowGallery(false)}
-            style={{marginTop: 24, background: '#fff', color: '#222', border: 'none', borderRadius: 6, padding: '0.4rem 1.2rem', fontWeight: 600, fontSize: '1rem', cursor: 'pointer'}}
-          >
-            Close
-          </button>
-        </div>
+        </>
       ) : (
         <>
           {/* Only show notes and edit form if visitor matches user */}

@@ -2,10 +2,10 @@ import Spinner from "./Spinner";
 import styles from "./CityList.module.css";
 import CityItem from "./CityItem";
 import Message from "./Message";
-import { useCities } from "../contexts/CitiesContext";
+import { useFilteredCities } from "../hooks/useFilteredCities";
 
 function CityList({visitor}) {
-  const { cities, isLoading } = useCities();
+  const { cities, isLoading } = useFilteredCities();
 
     // Filter cities that belong to this visitor'
   const userCities = cities.filter(city =>

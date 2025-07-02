@@ -4,6 +4,7 @@ import {
   useContext,
   useReducer,
   useCallback,
+  useMemo,
 } from "react";
 
 import {
@@ -14,6 +15,7 @@ import {
   updateCityAPI,
 } from "../services/citiesService";
 import { useAuth } from "./AuthContext";
+import { useGroups } from "./GroupsContext";
 
 const CitiesContext = createContext();
 

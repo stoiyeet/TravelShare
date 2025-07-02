@@ -105,3 +105,18 @@ exports.getAllUsersColors = async (req, res) => {
     res.status(500).json({ message: "Server error", error: err.message });
   }
 };
+
+exports.getAllUsers = async (req, res) => {
+  try {
+    const users = await User.find({}, 'username email color avatar');
+    // Set default color to #000 for users without a color
+    const usersWithDefaultColor = users.map(user => ({
+      ...user.toObject(),
+      color: user.color || "#000"
+    }));
+    res.status(200).json(usersWithDefaultColor);
+  } catch (err) {
+    console.error("Get all users error:", err);
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
+};

@@ -8,10 +8,11 @@ import {
 
 import { CitiesProvider } from "./contexts/CitiesContext";
 import AuthProvider from "./contexts/AuthContext";
+import { GroupsProvider } from "./contexts/GroupsContext";
 import ProtectedRoute from "./pages/ProtectedRoute";
 
 import UserList from "./components/UserList";
-import CountryList from "./components/CountryList";
+import GroupList from "./components/GroupList";
 import City from "./components/City";
 import Form from "./components/Form";
 import SpinnerFullPage from "./components/SpinnerFullPage";
@@ -67,8 +68,8 @@ const router = createBrowserRouter([
         element: <City />,
       },
       {
-        path: "countries",
-        element: <CountryList />,
+        path: "groups",
+        element: <GroupList />,
       },
       {
         path: "form",
@@ -90,9 +91,11 @@ function App() {
   return (
     <AuthProvider>
       <CitiesProvider>
-        <Suspense fallback={<SpinnerFullPage />}>
-          <RouterProvider router={router} />
-        </Suspense>
+        <GroupsProvider>
+          <Suspense fallback={<SpinnerFullPage />}>
+            <RouterProvider router={router} />
+          </Suspense>
+        </GroupsProvider>
       </CitiesProvider>
     </AuthProvider>
   );

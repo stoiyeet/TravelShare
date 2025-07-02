@@ -25,3 +25,7 @@ export async function userAPI(endpoint, method, data = null) {
 export async function getAvailableColours() {
   return await userAPI("available-colours", "GET");
 }
+
+export async function getAllUsers() {
+  return await userAPI("all", "GET");
+}

@@ -10,7 +10,8 @@ router.use(authController.auth);
 router.put("/profile", userController.updateProfile);
 router.put("/password", userController.updatePassword);
 router.get("/colors", userController.getAllUsersColors);
-router.get("/available-colours", userController.getAvailableColours); 
+router.get("/available-colours", userController.getAvailableColours);
+router.get("/all", userController.getAllUsers);
 
 
 module.exports = router;

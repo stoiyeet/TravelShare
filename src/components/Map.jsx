@@ -11,7 +11,7 @@ import L from "leaflet";
 
 import styles from "./Map.module.css";
 import { useEffect, useState } from "react";
-import { useCities } from "../contexts/CitiesContext";
+import { useFilteredCities } from "../hooks/useFilteredCities";
 import { useGeolocation } from "../hooks/useGeolocation";
 import { useUrlPosition } from "../hooks/useUrlPosition";
 import { useLocation } from "react-router-dom";
@@ -35,7 +35,7 @@ function mapColorFromOwner(city, user) {
 }
 
 function Map() {
-  let { cities } = useCities();
+  let { cities } = useFilteredCities();
   const [mapPosition, setMapPosition] = useState([40, 0]);
   const {
     isLoading: isLoadingPosition,

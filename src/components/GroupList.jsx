@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect } from "react"; 
 import { useGroups } from "../contexts/GroupsContext";
 import { getAllUsers, getAvailableColours } from "../services/userService";
 import { useAuth } from "../contexts/AuthContext";
@@ -41,7 +41,6 @@ function GroupList() {
     setUsersLoading(true);
     try {
       const users = await getAllUsers();
-      // Filter out current user from the list
       const filteredUsers = users.filter(u => u.username !== user.username);
       setAllUsers(filteredUsers);
     } catch (error) {
@@ -61,19 +60,23 @@ function GroupList() {
     }
   };
 
+  const getUsedColors = () => Object.values(memberColors);
+
+  const getUnusedColor = () =>
+    availableColors.find(color => !getUsedColors().includes(color)) || "#000";
+
   const handleCreateGroup = (e) => {
     e.preventDefault();
     if (!newGroupName.trim()) return;
 
-    // Prepare members with colors, including the current user
     const membersWithColors = [
       {
         user: user.username,
-        color: memberColors[user.username] || availableColors[0] || "#000"
+        color: memberColors[user.username] || getUnusedColor()
       },
       ...selectedMembers.map(username => ({
         user: username,
-        color: memberColors[username] || "#000"
+        color: memberColors[username] || getUnusedColor()
       }))
     ];
 
@@ -89,12 +92,11 @@ function GroupList() {
     e.preventDefault();
     if (!newGroupName.trim()) return;
 
-    // Prepare members with colors, ensuring creator stays
     const membersWithColors = selectedMembers
-      .filter(username => username !== user.username) // Remove creator from selected list
+      .filter(username => username !== user.username)
       .map(username => ({
         user: username,
-        color: memberColors[username] || "#000"
+        color: memberColors[username] || getUnusedColor()
       }));
 
     updateGroup(showEditForm, {
@@ -113,21 +115,17 @@ function GroupList() {
 
   const startEdit = (group) => {
     setNewGroupName(group.name);
-    
-    // Extract usernames from members (excluding creator)
     const memberUsernames = group.members
       .filter(member => member.username !== user.username)
       .map(member => member.username);
-    
+
     setSelectedMembers(memberUsernames);
-    
-    // Set up member colors
+
     const colors = {};
     group.members.forEach(member => {
       colors[member.username] = member.color;
     });
     setMemberColors(colors);
-    
     setShowEditForm(group.id);
     setShowCreateForm(false);
   };
@@ -143,23 +141,30 @@ function GroupList() {
 
   const toggleMemberSelection = (username) => {
     setSelectedMembers(prev => {
-      const newSelected = prev.includes(username)
+      const isSelected = prev.includes(username);
+      const newSelected = isSelected
         ? prev.filter(member => member !== username)
         : [...prev, username];
-      
-      // Set default color for newly selected members
-      if (!prev.includes(username) && !memberColors[username]) {
+
+      if (!isSelected && !memberColors[username]) {
+        const unusedColor = getUnusedColor();
         setMemberColors(prevColors => ({
           ...prevColors,
-          [username]: availableColors[0] || "#000"
+          [username]: unusedColor
         }));
       }
-      
+
       return newSelected;
     });
   };
 
   const updateMemberColor = (username, color) => {
+    const usedColors = Object.entries(memberColors)
+      .filter(([key]) => key !== username)
+      .map(([_, val]) => val);
+
+    if (usedColors.includes(color)) return; // Prevent duplicate
+
     setMemberColors(prev => ({
       ...prev,
       [username]: color
@@ -170,12 +175,11 @@ function GroupList() {
     user.username.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // Initialize creator color when creating new group
   useEffect(() => {
     if (showCreateForm && !memberColors[user.username]) {
       setMemberColors(prev => ({
         ...prev,
-        [user.username]: availableColors[0] || "#000"
+        [user.username]: getUnusedColor()
       }));
     }
   }, [showCreateForm, user.username, availableColors, memberColors]);
@@ -197,9 +201,12 @@ function GroupList() {
         </Button>
       </div>
 
-      {showCreateForm && (
-        <form className={styles.groupForm} onSubmit={handleCreateGroup}>
-          <h4>Create New Group</h4>
+      {(showCreateForm || showEditForm) && (
+        <form
+          className={styles.groupForm}
+          onSubmit={showCreateForm ? handleCreateGroup : handleEditGroup}
+        >
+          <h4>{showCreateForm ? "Create New Group" : "Edit Group"}</h4>
           <input
             type="text"
             placeholder="Group name"
@@ -207,8 +214,7 @@ function GroupList() {
             onChange={(e) => setNewGroupName(e.target.value)}
             required
           />
-          
-          {/* Creator section */}
+
           <div className={styles.creatorSection}>
             <h5>You (Group Creator):</h5>
             <div className={styles.memberOption}>
@@ -218,20 +224,22 @@ function GroupList() {
               ></span>
               {user.username}
               <div className={styles.colorOptions}>
-                {availableColors.map(color => (
-                  <div
-                    key={color}
-                    className={styles.colorSwatch}
-                    style={{ backgroundColor: color }}
-                    onClick={() => updateMemberColor(user.username, color)}
-                  ></div>
-                ))}
+                {availableColors
+                  .filter(color => !getUsedColors().includes(color) || memberColors[user.username] === color)
+                  .map(color => (
+                    <div
+                      key={color}
+                      className={styles.colorSwatch}
+                      style={{ backgroundColor: color }}
+                      onClick={() => updateMemberColor(user.username, color)}
+                    ></div>
+                  ))}
               </div>
             </div>
           </div>
 
           <div className={styles.memberSelection}>
-            <h5>Add Members:</h5>
+            <h5>{showCreateForm ? "Add Members" : "Edit Members"}:</h5>
             <input
               type="text"
               placeholder="Search users by username..."
@@ -256,107 +264,26 @@ function GroupList() {
                   </label>
                   {selectedMembers.includes(user.username) && (
                     <div className={styles.colorOptions}>
-                      {availableColors.map(color => (
-                        <div
-                          key={color}
-                          className={styles.colorSwatch}
-                          style={{ backgroundColor: color }}
-                          onClick={() => updateMemberColor(user.username, color)}
-                        ></div>
-                      ))}
+                      {availableColors
+                        .filter(color => !getUsedColors().includes(color) || memberColors[user.username] === color)
+                        .map(color => (
+                          <div
+                            key={color}
+                            className={styles.colorSwatch}
+                            style={{ backgroundColor: color }}
+                            onClick={() => updateMemberColor(user.username, color)}
+                          ></div>
+                        ))}
                     </div>
                   )}
                 </div>
               ))}
             </div>
           </div>
-          <div className={styles.formButtons}>
-            <Button type="primary">Create</Button>
-            <Button type="back" onClick={resetForm}>
-              Cancel
-            </Button>
-          </div>
-        </form>
-      )}
 
-      {showEditForm && (
-        <form className={styles.groupForm} onSubmit={handleEditGroup}>
-          <h4>Edit Group</h4>
-          <input
-            type="text"
-            placeholder="Group name"
-            value={newGroupName}
-            onChange={(e) => setNewGroupName(e.target.value)}
-            required
-          />
-          
-          {/* Creator section - non-editable */}
-          <div className={styles.creatorSection}>
-            <h5>You (Group Creator):</h5>
-            <div className={styles.memberOption}>
-              <span
-                className={styles.colorDot}
-                style={{ backgroundColor: memberColors[user.username] || "#000" }}
-              ></span>
-              {user.username}
-              <div className={styles.colorOptions}>
-                {availableColors.map(color => (
-                  <div
-                    key={color}
-                    className={styles.colorSwatch}
-                    style={{ backgroundColor: color }}
-                    onClick={() => updateMemberColor(user.username, color)}
-                  ></div>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          <div className={styles.memberSelection}>
-            <h5>Edit Members:</h5>
-            <input
-              type="text"
-              placeholder="Search users by username..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className={styles.searchInput}
-            />
-            <div className={styles.usersList}>
-              {filteredUsers.map((user) => (
-                <div key={user.username} className={styles.userItem}>
-                  <label className={styles.memberOption}>
-                    <input
-                      type="checkbox"
-                      checked={selectedMembers.includes(user.username)}
-                      onChange={() => toggleMemberSelection(user.username)}
-                    />
-                    <span
-                      className={styles.colorDot}
-                      style={{ backgroundColor: memberColors[user.username] || "#000" }}
-                    ></span>
-                    {user.username}
-                  </label>
-                  {selectedMembers.includes(user.username) && (
-                    <div className={styles.colorOptions}>
-                      {availableColors.map(color => (
-                        <div
-                          key={color}
-                          className={styles.colorSwatch}
-                          style={{ backgroundColor: color }}
-                          onClick={() => updateMemberColor(user.username, color)}
-                        ></div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
           <div className={styles.formButtons}>
-            <Button type="primary">Update</Button>
-            <Button type="back" onClick={resetForm}>
-              Cancel
-            </Button>
+            <Button type="primary">{showCreateForm ? "Create" : "Update"}</Button>
+            <Button type="back" onClick={resetForm}>Cancel</Button>
           </div>
         </form>
       )}
@@ -368,9 +295,7 @@ function GroupList() {
           {groups.map((group) => (
             <div
               key={group.id}
-              className={`${styles.groupItem} ${
-                activeGroup?.id === group.id ? styles.active : ""
-              }`}
+              className={`${styles.groupItem} ${activeGroup?.id === group.id ? styles.active : ""}`}
             >
               <div
                 className={styles.groupInfo}
@@ -380,9 +305,9 @@ function GroupList() {
                 <p>{group.members.length} members</p>
                 <div className={styles.members}>
                   {group.members.map((member) => {
-                    const memberUsername = typeof member === 'string' ? member : member.username;
-                    const memberColor = typeof member === 'string' ? "#000" : member.color;
-                    
+                    const memberUsername = typeof member === "string" ? member : member.username;
+                    const memberColor = typeof member === "string" ? "#000" : member.color;
+
                     return (
                       <span
                         key={memberUsername}

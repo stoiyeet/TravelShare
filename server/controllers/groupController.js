@@ -5,10 +5,7 @@ const User = require("../models/userModel");
 const getGroups = async (req, res) => {
   try {
     const groups = await Group.find({
-      $or: [
-        { createdBy: req.user._id },
-        { "members.user": req.user._id }
-      ]
+      createdBy: req.user._id
     })
     .populate("members.user", "username email avatar")
     .populate("createdBy", "username email")
@@ -27,6 +24,7 @@ const getGroups = async (req, res) => {
   }
 };
 
+
 // Create a new group
 const createGroup = async (req, res) => {
   try {
@@ -41,6 +39,13 @@ const createGroup = async (req, res) => {
 
     // Validate and process members
     const processedMembers = [];
+    
+    // Always add the creator as the first member
+    processedMembers.push({
+      user: req.user._id,
+      color: "#000", // Default color for creator, will be updated by frontend
+    });
+
     if (members && Array.isArray(members)) {
       for (const memberData of members) {
         let userId;
@@ -50,13 +55,13 @@ const createGroup = async (req, res) => {
         if (typeof memberData === "string") {
           // Find user by username
           const user = await User.findOne({ username: memberData });
-          if (user) {
+          if (user && user._id.toString() !== req.user._id.toString()) {
             userId = user._id;
           }
         } else if (memberData.user) {
           // Handle object format
           const user = await User.findOne({ username: memberData.user });
-          if (user) {
+          if (user && user._id.toString() !== req.user._id.toString()) {
             userId = user._id;
             color = memberData.color || "#000";
           }
@@ -111,16 +116,11 @@ const updateGroup = async (req, res) => {
       });
     }
 
-    // Check if user has permission to update (creator or member)
-    const isMember = group.members.some(member => 
-      member.user.toString() === req.user._id.toString()
-    );
-    const isCreator = group.createdBy.toString() === req.user._id.toString();
-
-    if (!isCreator && !isMember) {
+    // Check if user is the creator
+    if (group.createdBy.toString() !== req.user._id.toString()) {
       return res.status(403).json({
         status: "error",
-        message: "You don't have permission to update this group",
+        message: "Only the group creator can update this group",
       });
     }
 
@@ -132,18 +132,32 @@ const updateGroup = async (req, res) => {
     // Update members if provided
     if (members && Array.isArray(members)) {
       const processedMembers = [];
+      
+      // Always keep the creator as the first member
+      const creatorMember = group.members.find(member => 
+        member.user.toString() === req.user._id.toString()
+      );
+      if (creatorMember) {
+        processedMembers.push(creatorMember);
+      } else {
+        processedMembers.push({
+          user: req.user._id,
+          color: "#000",
+        });
+      }
+
       for (const memberData of members) {
         let userId;
         let color = "#000";
 
         if (typeof memberData === "string") {
           const user = await User.findOne({ username: memberData });
-          if (user) {
+          if (user && user._id.toString() !== req.user._id.toString()) {
             userId = user._id;
           }
         } else if (memberData.user) {
           const user = await User.findOne({ username: memberData.user });
-          if (user) {
+          if (user && user._id.toString() !== req.user._id.toString()) {
             userId = user._id;
             color = memberData.color || "#000";
           }

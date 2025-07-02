@@ -11,16 +11,19 @@ export function useFilteredCities() {
       return cities;
     }
 
-    return cities.filter(city => {
+    let shortenedCities = cities.filter(city => {
       // Check if any of the city's owners are in the active group
       if (!city.owners || city.owners.length === 0) {
         return false;
       }
 
+      const memberUsernames = activeGroup.members.map(member => member.username);
+
       return city.owners.some(owner => 
-        activeGroup.members.includes(owner.username)
+        memberUsernames.includes(owner.username)
       );
     });
+    return shortenedCities;
   }, [cities, activeGroup]);
 
   return {

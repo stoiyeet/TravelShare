@@ -33,15 +33,15 @@ if (shouldRefresh) {
       <Message message={`No cities have been visited by members of "${activeGroup.name}" yet`} />
     );
 
-  // Create a map of username to color
- const visitorColors = {};
-cities.forEach(city => {
-  (city.owners || []).forEach(owner => {
-    if (owner?.username && !visitorColors[owner.username]) {
-      visitorColors[owner.username] = owner.color;
-    }
-  });
-});
+  // Create a map of username to color from the active group
+  const visitorColors = {};
+  if (activeGroup && activeGroup.members) {
+    activeGroup.members.forEach(member => {
+      const memberUsername = typeof member === 'string' ? member : member.username;
+      const memberColor = typeof member === 'string' ? "#000" : member.color;
+      visitorColors[memberUsername] = memberColor;
+    });
+  }
 
 
   return (

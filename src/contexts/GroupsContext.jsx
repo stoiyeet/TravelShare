@@ -5,6 +5,12 @@ import {
   useCallback,
   useEffect,
 } from "react";
+import {
+  getAllGroups,
+  createGroup as createGroupAPI,
+  updateGroup as updateGroupAPI,
+  deleteGroup as deleteGroupAPI,
+} from "../services/groupService";
 
 const GroupsContext = createContext();
 
@@ -75,24 +81,45 @@ function GroupsProvider({ children }) {
     initialState
   );
 
-  // For now, we'll store groups in localStorage since there's no backend for groups yet
-  const loadGroups = useCallback(() => {
+  const loadGroups = useCallback(async () => {
     dispatch({ type: "loading" });
     try {
-      const storedGroups = localStorage.getItem("groups");
-      const groups = storedGroups ? JSON.parse(storedGroups) : [];
-      dispatch({ type: "groups/loaded", payload: groups });
+      const groups = await getAllGroups();
+      // Transform the groups to match the expected format
+      const transformedGroups = groups.map(group => ({
+        id: group._id,
+        name: group.name,
+        members: group.members.map(member => ({
+          username: member.user.username,
+          color: member.color,
+          userId: member.user._id,
+        })),
+        createdAt: group.createdAt,
+        createdBy: group.createdBy,
+      }));
+      
+      dispatch({ type: "groups/loaded", payload: transformedGroups });
       
       // Set first group as active if none is set
       const storedActiveGroup = localStorage.getItem("activeGroup");
       if (storedActiveGroup) {
         const activeGroup = JSON.parse(storedActiveGroup);
-        dispatch({ type: "activeGroup/set", payload: activeGroup });
-      } else if (groups.length > 0) {
-        dispatch({ type: "activeGroup/set", payload: groups[0] });
-        localStorage.setItem("activeGroup", JSON.stringify(groups[0]));
+        // Check if the stored active group still exists
+        const existingGroup = transformedGroups.find(g => g.id === activeGroup.id);
+        if (existingGroup) {
+          dispatch({ type: "activeGroup/set", payload: existingGroup });
+        } else if (transformedGroups.length > 0) {
+          dispatch({ type: "activeGroup/set", payload: transformedGroups[0] });
+          localStorage.setItem("activeGroup", JSON.stringify(transformedGroups[0]));
+        } else {
+          localStorage.removeItem("activeGroup");
+        }
+      } else if (transformedGroups.length > 0) {
+        dispatch({ type: "activeGroup/set", payload: transformedGroups[0] });
+        localStorage.setItem("activeGroup", JSON.stringify(transformedGroups[0]));
       }
     } catch (err) {
+      console.error("Error loading groups:", err);
       dispatch({
         type: "rejected",
         payload: "There was an error loading groups...",
@@ -105,97 +132,99 @@ function GroupsProvider({ children }) {
     loadGroups();
   }, [loadGroups]);
 
-  const createGroup = useCallback((groupData) => {
+  const createGroup = useCallback(async (groupData) => {
     dispatch({ type: "loading" });
     try {
-      const newGroup = {
-        id: Date.now().toString(),
-        name: groupData.name,
-        members: groupData.members || [],
-        createdAt: new Date().toISOString(),
+      const createdGroup = await createGroupAPI(groupData);
+      
+      // Transform the created group to match the expected format
+      const transformedGroup = {
+        id: createdGroup._id,
+        name: createdGroup.name,
+        members: createdGroup.members.map(member => ({
+          username: member.user.username,
+          color: member.color,
+          userId: member.user._id,
+        })),
+        createdAt: createdGroup.createdAt,
+        createdBy: createdGroup.createdBy,
       };
 
-      const storedGroups = localStorage.getItem("groups");
-      const groups = storedGroups ? JSON.parse(storedGroups) : [];
-      const updatedGroups = [...groups, newGroup];
-      
-      localStorage.setItem("groups", JSON.stringify(updatedGroups));
-      dispatch({ type: "group/created", payload: newGroup });
+      dispatch({ type: "group/created", payload: transformedGroup });
 
       // Set as active group if it's the first one
-      if (updatedGroups.length === 1) {
-        dispatch({ type: "activeGroup/set", payload: newGroup });
-        localStorage.setItem("activeGroup", JSON.stringify(newGroup));
+      if (groups.length === 0) {
+        dispatch({ type: "activeGroup/set", payload: transformedGroup });
+        localStorage.setItem("activeGroup", JSON.stringify(transformedGroup));
       }
     } catch (err) {
+      console.error("Error creating group:", err);
       dispatch({
         type: "rejected",
         payload: "There was an error creating the group...",
       });
     }
-  }, []);
+  }, [groups.length]);
 
-  const deleteGroup = useCallback((groupId) => {
+  const deleteGroup = useCallback(async (groupId) => {
     dispatch({ type: "loading" });
     try {
-      const storedGroups = localStorage.getItem("groups");
-      const groups = storedGroups ? JSON.parse(storedGroups) : [];
-      const updatedGroups = groups.filter((group) => group.id !== groupId);
-      
-      localStorage.setItem("groups", JSON.stringify(updatedGroups));
+      await deleteGroupAPI(groupId);
       dispatch({ type: "group/deleted", payload: groupId });
 
       // Update active group if needed
-      const storedActiveGroup = localStorage.getItem("activeGroup");
-      if (storedActiveGroup) {
-        const activeGroup = JSON.parse(storedActiveGroup);
-        if (activeGroup.id === groupId) {
-          const newActiveGroup = updatedGroups.length > 0 ? updatedGroups[0] : null;
-          dispatch({ type: "activeGroup/set", payload: newActiveGroup });
-          if (newActiveGroup) {
-            localStorage.setItem("activeGroup", JSON.stringify(newActiveGroup));
-          } else {
-            localStorage.removeItem("activeGroup");
-          }
+      if (activeGroup?.id === groupId) {
+        const remainingGroups = groups.filter(group => group.id !== groupId);
+        const newActiveGroup = remainingGroups.length > 0 ? remainingGroups[0] : null;
+        dispatch({ type: "activeGroup/set", payload: newActiveGroup });
+        if (newActiveGroup) {
+          localStorage.setItem("activeGroup", JSON.stringify(newActiveGroup));
+        } else {
+          localStorage.removeItem("activeGroup");
         }
       }
     } catch (err) {
+      console.error("Error deleting group:", err);
       dispatch({
         type: "rejected",
         payload: "There was an error deleting the group...",
       });
     }
-  }, []);
+  }, [activeGroup, groups]);
 
-  const updateGroup = useCallback((groupId, updateData) => {
+  const updateGroup = useCallback(async (groupId, updateData) => {
     dispatch({ type: "loading" });
     try {
-      const storedGroups = localStorage.getItem("groups");
-      const groups = storedGroups ? JSON.parse(storedGroups) : [];
-      const updatedGroups = groups.map((group) =>
-        group.id === groupId ? { ...group, ...updateData } : group
-      );
+      const updatedGroup = await updateGroupAPI(groupId, updateData);
       
-      localStorage.setItem("groups", JSON.stringify(updatedGroups));
-      const updatedGroup = updatedGroups.find((group) => group.id === groupId);
-      dispatch({ type: "group/updated", payload: updatedGroup });
+      // Transform the updated group to match the expected format
+      const transformedGroup = {
+        id: updatedGroup._id,
+        name: updatedGroup.name,
+        members: updatedGroup.members.map(member => ({
+          username: member.user.username,
+          color: member.color,
+          userId: member.user._id,
+        })),
+        createdAt: updatedGroup.createdAt,
+        createdBy: updatedGroup.createdBy,
+      };
+
+      dispatch({ type: "group/updated", payload: transformedGroup });
 
       // Update active group if it's the one being updated
-      const storedActiveGroup = localStorage.getItem("activeGroup");
-      if (storedActiveGroup) {
-        const activeGroup = JSON.parse(storedActiveGroup);
-        if (activeGroup.id === groupId) {
-          dispatch({ type: "activeGroup/set", payload: updatedGroup });
-          localStorage.setItem("activeGroup", JSON.stringify(updatedGroup));
-        }
+      if (activeGroup?.id === groupId) {
+        dispatch({ type: "activeGroup/set", payload: transformedGroup });
+        localStorage.setItem("activeGroup", JSON.stringify(transformedGroup));
       }
     } catch (err) {
+      console.error("Error updating group:", err);
       dispatch({
         type: "rejected",
         payload: "There was an error updating the group...",
       });
     }
-  }, []);
+  }, [activeGroup]);
 
   const setActiveGroup = useCallback((group) => {
     dispatch({ type: "activeGroup/set", payload: group });

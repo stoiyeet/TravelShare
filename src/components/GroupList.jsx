@@ -83,7 +83,11 @@ function GroupList() {
 
   const startEdit = (group) => {
     setNewGroupName(group.name);
-    setSelectedMembers(group.members);
+    // Extract usernames from members (handle both old and new format)
+    const memberUsernames = group.members.map(member => 
+      typeof member === 'string' ? member : member.username
+    );
+    setSelectedMembers(memberUsernames);
     setShowEditForm(group.id);
     setShowCreateForm(false);
   };
@@ -210,13 +214,16 @@ function GroupList() {
                 <h4>{group.name}</h4>
                 <p>{group.members.length} members</p>
                 <div className={styles.members}>
-                  {group.members.map((memberUsername) => {
-                    const user = allUsers.find(u => u.username === memberUsername);
+                  {group.members.map((member) => {
+                    // Handle both old format (string) and new format (object)
+                    const memberUsername = typeof member === 'string' ? member : member.username;
+                    const memberColor = typeof member === 'string' ? "#000" : member.color;
+                    
                     return (
                       <span
                         key={memberUsername}
                         className={styles.member}
-                        style={{ backgroundColor: user?.color || "#000" }}
+                        style={{ backgroundColor: memberColor }}
                         title={memberUsername}
                       >
                         {memberUsername.charAt(0).toUpperCase()}

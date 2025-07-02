@@ -29,13 +29,28 @@ function getColoredMarkerIcon(color) {
   return `/Colours/${cleanedColor}.png`;
 }
 
-function mapColorFromOwner(city, user) {
+function mapColorFromOwner(city, user, activeGroup) {
+  // If there's an active group, get color from group member
+  if (activeGroup && activeGroup.members && city.owners?.length > 0) {
+    const ownerUsername = city.owners[0].username;
+    const groupMember = activeGroup.members.find(member => {
+      const memberUsername = typeof member === 'string' ? member : member.username;
+      return memberUsername === ownerUsername;
+    });
+    
+    if (groupMember) {
+      const memberColor = typeof groupMember === 'string' ? "#000" : groupMember.color;
+      return memberColor;
+    }
+  }
+  
+  // Fallback to city owner color or user color
   if (city.owners?.length > 0) return city.owners[0].color;
   else return user?.color || "000";
 }
 
 function Map() {
-  let { cities } = useFilteredCities();
+  let { cities, activeGroup } = useFilteredCities();
   const [mapPosition, setMapPosition] = useState([40, 0]);
   const {
     isLoading: isLoadingPosition,
@@ -133,7 +148,7 @@ function Map() {
           url="https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png"
         />
         {cities.map((city) => {
-          const markerColor = mapColorFromOwner(city, user);
+          const markerColor = mapColorFromOwner(city, user, activeGroup);
           const customIcon = new L.Icon({
             iconUrl: getColoredMarkerIcon(markerColor),
             iconSize: [25, 41],

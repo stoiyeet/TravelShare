@@ -4,6 +4,7 @@ const dotenv = require("dotenv");
 const cookieParser = require("cookie-parser");
 const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
+const groupRoutes = require("./routes/groupRoutes");
 const connectDB = require("./connections/mongoDB");
 
 dotenv.config();
@@ -47,7 +48,8 @@ app.get("/", (req, res) => {
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/cities", cityRoutes);
-app.use("/api/user",  userRoutes)
+app.use("/api/user",  userRoutes);
+app.use("/api/groups", groupRoutes);
 
 // Connect to MongoDB and start server
 const PORT = process.env.PORT || 9000;

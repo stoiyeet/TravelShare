@@ -30,6 +30,7 @@ function GroupList() {
   const [searchTerm, setSearchTerm] = useState("");
   const [availableColors, setAvailableColors] = useState([]);
   const [allColors, setAllColors] = useState([]);
+  const [openDropdown, setOpenDropdown] = useState(null);
 
   useEffect(() => {
     loadGroups();
@@ -62,9 +63,6 @@ function GroupList() {
 
   const getUsedColors = () => Object.values(memberColors);
 
-  const getUnusedColor = () =>
-    availableColors.find(color => !getUsedColors().includes(color)) || "#000";
-
   const handleCreateGroup = (e) => {
     e.preventDefault();
     if (!newGroupName.trim()) return;
@@ -72,11 +70,11 @@ function GroupList() {
     const membersWithColors = [
       {
         user: user.username,
-        color: memberColors[user.username] || getUnusedColor()
+        color: memberColors[user.username]
       },
       ...selectedMembers.map(username => ({
         user: username,
-        color: memberColors[username] || getUnusedColor()
+        color: memberColors[username]
       }))
     ];
 
@@ -96,7 +94,7 @@ function GroupList() {
       .filter(username => username !== user.username)
       .map(username => ({
         user: username,
-        color: memberColors[username] || getUnusedColor()
+        color: memberColors[username]
       }));
 
     updateGroup(showEditForm, {
@@ -137,24 +135,34 @@ function GroupList() {
     setShowEditForm(null);
     setShowCreateForm(false);
     setSearchTerm("");
+    setOpenDropdown(null);
   };
 
-  const toggleMemberSelection = (username) => {
+  const handleColorSelect = (username, color) => {
+    // Add user to selected members with the chosen color
     setSelectedMembers(prev => {
-      const isSelected = prev.includes(username);
-      const newSelected = isSelected
-        ? prev.filter(member => member !== username)
-        : [...prev, username];
-
-      if (!isSelected && !memberColors[username]) {
-        const unusedColor = getUnusedColor();
-        setMemberColors(prevColors => ({
-          ...prevColors,
-          [username]: unusedColor
-        }));
+      if (!prev.includes(username)) {
+        return [...prev, username];
       }
+      return prev;
+    });
 
-      return newSelected;
+    // Set the color for this user
+    setMemberColors(prev => ({
+      ...prev,
+      [username]: color
+    }));
+
+    // Close the dropdown
+    setOpenDropdown(null);
+  };
+
+  const handleRemoveMember = (username) => {
+    setSelectedMembers(prev => prev.filter(member => member !== username));
+    setMemberColors(prev => {
+      const newColors = { ...prev };
+      delete newColors[username];
+      return newColors;
     });
   };
 
@@ -175,14 +183,25 @@ function GroupList() {
     user.username.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const availableUsersToAdd = filteredUsers.filter(user => 
+    !selectedMembers.includes(user.username)
+  );
+
+  const getAvailableColorsForUser = (username) => {
+    const usedColors = getUsedColors();
+    return availableColors.filter(color => !usedColors.includes(color));
+  };
+
   useEffect(() => {
     if (showCreateForm && !memberColors[user.username]) {
+      // Set a default color for the creator
+      const firstAvailableColor = availableColors.find(color => !getUsedColors().includes(color)) || availableColors[0];
       setMemberColors(prev => ({
         ...prev,
-        [user.username]: getUnusedColor()
+        [user.username]: firstAvailableColor
       }));
     }
-  }, [showCreateForm, user.username, availableColors, memberColors]);
+  }, [showCreateForm, user.username, availableColors]);
 
   if (isLoading || usersLoading) return <Spinner />;
 
@@ -240,40 +259,81 @@ function GroupList() {
 
           <div className={styles.memberSelection}>
             <h5>{showCreateForm ? "Add Members" : "Edit Members"}:</h5>
+            
+            {/* Selected Members Display */}
+            {selectedMembers.length > 0 && (
+              <div className={styles.selectedMembers}>
+                <h6>Selected Members:</h6>
+                <div className={styles.selectedMembersList}>
+                  {selectedMembers.map((username) => (
+                    <div key={username} className={styles.selectedMemberItem}>
+                      <span
+                        className={styles.colorDot}
+                        style={{ backgroundColor: memberColors[username] || "#000" }}
+                      ></span>
+                      {username}
+                      <div className={styles.colorOptions}>
+                        {availableColors
+                          .filter(color => !getUsedColors().includes(color) || memberColors[username] === color)
+                          .map(color => (
+                            <div
+                              key={color}
+                              className={styles.colorSwatch}
+                              style={{ backgroundColor: color }}
+                              onClick={() => updateMemberColor(username, color)}
+                            ></div>
+                          ))}
+                      </div>
+                      <button
+                        type="button"
+                        className={styles.removeMemberBtn}
+                        onClick={() => handleRemoveMember(username)}
+                        title="Remove member"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Available Users to Add */}
             <input
               type="text"
-              placeholder="Search users by username..."
+              placeholder="Search users to add..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className={styles.searchInput}
             />
             <div className={styles.usersList}>
-              {filteredUsers.map((user) => (
+              {availableUsersToAdd.map((user) => (
                 <div key={user.username} className={styles.userItem}>
-                  <label className={styles.memberOption}>
-                    <input
-                      type="checkbox"
-                      checked={selectedMembers.includes(user.username)}
-                      onChange={() => toggleMemberSelection(user.username)}
-                    />
-                    <span
-                      className={styles.colorDot}
-                      style={{ backgroundColor: memberColors[user.username] || "#000" }}
-                    ></span>
-                    {user.username}
-                  </label>
-                  {selectedMembers.includes(user.username) && (
-                    <div className={styles.colorOptions}>
-                      {availableColors
-                        .filter(color => !getUsedColors().includes(color) || memberColors[user.username] === color)
-                        .map(color => (
+                  <div 
+                    className={styles.userDropdownTrigger}
+                    onClick={() => setOpenDropdown(openDropdown === user.username ? null : user.username)}
+                  >
+                    <span className={styles.userName}>{user.username}</span>
+                    <span className={styles.dropdownArrow}>
+                      {openDropdown === user.username ? '▲' : '▼'}
+                    </span>
+                  </div>
+                  
+                  {openDropdown === user.username && (
+                    <div className={styles.colorDropdown}>
+                      {getAvailableColorsForUser(user.username).length > 0 ? (
+                        getAvailableColorsForUser(user.username).map(color => (
                           <div
                             key={color}
-                            className={styles.colorSwatch}
+                            className={styles.colorSwatchOption}
                             style={{ backgroundColor: color }}
-                            onClick={() => updateMemberColor(user.username, color)}
+                            onClick={() => handleColorSelect(user.username, color)}
+                            title={`Select ${user.username} with this color`}
                           ></div>
-                        ))}
+                        ))
+                      ) : (
+                        <div className={styles.noColorsMessage}>No colors available</div>
+                      )}
                     </div>
                   )}
                 </div>

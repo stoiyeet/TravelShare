@@ -197,3 +197,155 @@
 .groupItem.active .deleteBtn:hover {
   background: rgba(255, 255, 255, 0.2);
 }
+
+/* New CSS classes for the dropdown color picker functionality */
+
+/* User dropdown trigger */
+.userDropdownTrigger {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #f9f9f9;
+  transition: background-color 0.2s ease;
+}
+
+.userDropdownTrigger:hover {
+  background-color: #f0f0f0;
+}
+
+/* Username text */
+.userName {
+  font-weight: 500;
+  color: #333;
+}
+
+/* Dropdown arrow */
+.dropdownArrow {
+  font-size: 12px;
+  color: #666;
+  margin-left: 8px;
+}
+
+/* User item container - needs relative positioning for dropdown */
+.userItem {
+  position: relative;
+  margin-bottom: 10px;
+}
+
+/* Color dropdown container */
+.colorDropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+/* Individual color swatch options */
+.colorSwatchOption {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid #ddd;
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.colorSwatchOption:hover {
+  transform: scale(1.1);
+  border-color: #999;
+}
+
+/* No colors available message */
+.noColorsMessage {
+  color: #666;
+  font-style: italic;
+  padding: 5px;
+}
+
+/* Selected members section */
+.selectedMembers {
+  margin-bottom: 20px;
+}
+
+.selectedMembers h6 {
+  margin-bottom: 10px;
+  color: #333;
+  font-weight: 600;
+}
+
+/* Selected members list */
+.selectedMembersList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Individual selected member item */
+.selectedMemberItem {
+  display: flex;
+  align-items: center;
+  padding: 8px;
+  background-color: #f8f9fa;
+  border-radius: 6px;
+  border: 1px solid #e9ecef;
+  position: relative;
+}
+
+.selectedMemberItem .colorDot {
+  margin-right: 8px;
+}
+
+/* Remove member button */
+.removeMemberBtn {
+  background: none;
+  border: none;
+  color: #dc3545;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 3px;
+  margin-left: auto;
+  transition: background-color 0.2s ease;
+}
+
+.removeMemberBtn:hover {
+  background-color: #f5c6cb;
+}
+
+/* Color options for selected members */
+.selectedMemberItem .colorOptions {
+  margin-left: 12px;
+  margin-right: 12px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .colorDropdown {
+    left: -10px;
+    right: -10px;
+  }
+  
+  .selectedMemberItem {
+    flex-wrap: wrap;
+  }
+  
+  .selectedMemberItem .colorOptions {
+    margin-left: 0;
+    margin-top: 8px;
+    flex-basis: 100%;
+  }
+}

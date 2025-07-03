@@ -8,7 +8,7 @@ const groupMemberSchema = new mongoose.Schema({
   },
   color: {
     type: String,
-    default: "#000",
+    default: "#aaa",
   },
 });
 

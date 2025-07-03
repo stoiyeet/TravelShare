@@ -236,24 +236,56 @@ function GroupList() {
 
           <div className={styles.creatorSection}>
             <h5>You (Group Creator):</h5>
-            <div className={styles.memberOption}>
-              <span
-                className={styles.colorDot}
-                style={{ backgroundColor: memberColors[user.username] || "#000" }}
-              ></span>
-              {user.username}
-              <div className={styles.colorOptions}>
-                {availableColors
-                  .filter(color => !getUsedColors().includes(color) || memberColors[user.username] === color)
-                  .map(color => (
-                    <div
-                      key={color}
-                      className={styles.colorSwatch}
-                      style={{ backgroundColor: color }}
-                      onClick={() => updateMemberColor(user.username, color)}
-                    ></div>
-                  ))}
+            <div className={styles.memberOption} style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: 8 }}>
+              <div
+                className={styles.userDropdownTrigger}
+                onClick={() => setOpenDropdown(openDropdown === user.username ? null : user.username)}
+                style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', gap: 8 }}
+              >
+                <span
+                  className={styles.colorDot}
+                  style={{ backgroundColor: memberColors[user.username] || "#000" }}
+                ></span>
+                <span>{user.username}</span>
+                <span className={styles.dropdownArrow}>
+                  {openDropdown === user.username ? '▲' : '▼'}
+                </span>
               </div>
+              {openDropdown === user.username && (
+                <div className={styles.colorDropdown} style={{
+                  position: 'absolute',
+                  top: '100%',
+                  left: 0,
+                  backgroundColor: 'white',
+                  border: '1px solid #ddd',
+                  borderRadius: '4px',
+                  padding: '10px',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                  zIndex: 1000,
+                  display: 'flex',
+                  flexWrap: 'wrap',
+                  gap: '5px'
+                }}>
+                  {availableColors
+                    .filter(color => !getUsedColors().includes(color) || memberColors[user.username] === color)
+                    .map(color => (
+                      <div
+                        key={color}
+                        className={styles.colorSwatchOption}
+                        style={{
+                          backgroundColor: color,
+                          width: '30px',
+                          height: '30px',
+                          borderRadius: '50%',
+                          cursor: 'pointer',
+                          border: memberColors[user.username] === color ? '2px solid #333' : '2px solid #ddd'
+                        }}
+                        onClick={() => updateMemberColor(user.username, color)}
+                        title={`Select your color`}
+                      ></div>
+                    ))}
+                </div>
+              )}
             </div>
           </div>
 

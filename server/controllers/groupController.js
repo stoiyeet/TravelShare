@@ -39,12 +39,6 @@ const createGroup = async (req, res) => {
 
     // Validate and process members
     const processedMembers = [];
-    
-    // Always add the creator as the first member
-    processedMembers.push({
-      user: req.user._id,
-      color: "#000", // Default color for creator, will be updated by frontend
-    });
 
     if (members && Array.isArray(members)) {
       for (const memberData of members) {
@@ -55,13 +49,13 @@ const createGroup = async (req, res) => {
         if (typeof memberData === "string") {
           // Find user by username
           const user = await User.findOne({ username: memberData });
-          if (user && user._id.toString() !== req.user._id.toString()) {
+          if (user) {
             userId = user._id;
           }
         } else if (memberData.user) {
           // Handle object format
           const user = await User.findOne({ username: memberData.user });
-          if (user && user._id.toString() !== req.user._id.toString()) {
+          if (user) {
             userId = user._id;
             color = memberData.color || "#000";
           }

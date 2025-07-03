@@ -381,7 +381,7 @@ function GroupList() {
       )}
 
       {groups.length === 0 && !showCreateForm ? (
-        <Message message="Create your first group to start organizing cities by team members" />
+        <Message message="Create your first group to start sharing your travels 🤗" />
       ) : (
         <div className={styles.groups}>
           {groups.map((group) => (

@@ -57,7 +57,7 @@ const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <Navigate replace to="cities" />,
+        element: <Navigate replace to="groups" />,
       },
       {
         path: "cities",

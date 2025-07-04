@@ -14,6 +14,7 @@ function City() {
   const { user } = useAuth();
   const location = useLocation();
   const visitor = location.state?.visitor;
+  const fromMap = location.state?.fromMap;
   const isOwner = visitor === user?.username;
   const [showThumbnails, setShowThumbnails] = useState(false);
   const [showFullscreen, setShowFullscreen] = useState(false);
@@ -111,7 +112,7 @@ function City() {
         </h3>
       </div>
 
-      {isOwner && (
+      {isOwner && !fromMap && (
         <div className={styles.row} style={{ marginBottom: 16 }}>
           <label htmlFor="add-images" className={styles.uploadImagesButton}>
             Add Images
@@ -154,7 +155,7 @@ function City() {
                   setShowFullscreen(true);
                 }}
               />
-              {isOwner && (
+              {isOwner && !fromMap && (
                 <button
                   onClick={() => handleDeleteImage(img)}
                   disabled={imageDeleteLoading}
@@ -232,43 +233,52 @@ function City() {
       
       <>
         {isOwner ? (
-          <form onSubmit={handleUpdateVisit} className={styles.form}>
-            <h6>You visited on</h6>
-            <p>{formatDate(date || null)}</p>
-            <fieldset className={styles.formGroup}>
-              <legend>Update Visit Info</legend>
-              <div className={styles.row}>
-                <label htmlFor="date">Change the visit date:</label>
-                <input
-                  type="date"
-                  id="date"
-                  name="date"
-                  value={formDate}
-                  onChange={(e) => setFormDate(e.target.value)}
-                  max={new Date().toISOString().split("T")[0]}
-                />
-              </div>
-              <div className={styles.row}>
-                <label htmlFor="notes">Your notes:</label>
-                <input
-                  type="text"
-                  id="notes"
-                  value={formNotes}
-                  onChange={(e) => setFormNotes(e.target.value)}
-                  placeholder="Type your notes here..."
-                  name="notes"
-                />
-              </div>
-              <button type="submit" className={styles.saveBtn}>
-                Save
-              </button>
-            </fieldset>
-          </form>
+          fromMap ? (
+            <div className={styles.row}>
+              <h6>You visited on</h6>
+              <p>{formatDate(date || null)}</p>
+              <h6>Your Notes</h6>
+              <p>{notes || "No notes available."}</p>
+            </div>
+          ) : (
+            <form onSubmit={handleUpdateVisit} className={styles.form}>
+              <h6>You visited on</h6>
+              <p>{formatDate(date || null)}</p>
+              <fieldset className={styles.formGroup}>
+                <legend>Update Visit Info</legend>
+                <div className={styles.row}>
+                  <label htmlFor="date">Change the visit date:</label>
+                  <input
+                    type="date"
+                    id="date"
+                    name="date"
+                    value={formDate}
+                    onChange={(e) => setFormDate(e.target.value)}
+                    max={new Date().toISOString().split("T")[0]}
+                  />
+                </div>
+                <div className={styles.row}>
+                  <label htmlFor="notes">Your notes:</label>
+                  <input
+                    type="text"
+                    id="notes"
+                    value={formNotes}
+                    onChange={(e) => setFormNotes(e.target.value)}
+                    placeholder="Type your notes here..."
+                    name="notes"
+                  />
+                </div>
+                <button type="submit" className={styles.saveBtn}>
+                  Save
+                </button>
+              </fieldset>
+            </form>
+          )
         ) : (
           <div className={styles.row}>
-            <h6>{visitor} visited on</h6>
+            <h6>{visitor || currentCity?.owners?.[0]?.username} visited on</h6>
             <p>{formatDate(date || null)}</p>
-            <h6>{visitor}'s Notes</h6>
+            <h6>{visitor || currentCity?.owners?.[0]?.username}'s Notes</h6>
             <p>{notes || "No notes available."}</p>
           </div>
         )}
@@ -283,7 +293,7 @@ function City() {
           </a>
         </div>
       </>
-      <div>{isOwner ? <BackButtonRefresh /> : <BackButton />}</div>
+      <div>{isOwner && !fromMap ? <BackButtonRefresh /> : <BackButton />}</div>
     </div>
   );
 }

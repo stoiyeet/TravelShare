@@ -75,7 +75,7 @@ function Map() {
 
     try {
       const { lat, lng } = await getGeocode(searchCity);
-      const variance = 0.01;
+      const variance = 0.02;
       const adjLat = lat + (Math.random() * 2 - 1) * variance;
       const adjLng = lng + (Math.random() * 2 - 1) * variance;
       navigate(`form?lat=${adjLat}&lng=${adjLng}`);
@@ -167,9 +167,12 @@ function Map() {
               click: () => {
                 navigate(
                   `cities/${city._id}?lat=${city.position.lat}&lng=${city.position.lng}`,
-                  city.owners?.[0].username !== user.username
-                    ? { state: { visitor: city.owners?.[0].username } }
-                    : undefined
+                  {
+                    state: {
+                      fromMap: true,
+                      visitor: city.owners?.[0].username
+                    }
+                  }
                 );
               }
             }}

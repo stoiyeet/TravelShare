@@ -6,12 +6,18 @@ const path = require("path");
 
 exports.updateProfile = async (req, res) => {
   try {
-    const { username, avatar, color } = req.body;
+    const { userId, username, avatar, color } = req.body;
     
     if (!username) {
       return res.status(400).json({
         message: "Username is required",
       });
+    }
+    
+    // Check if username is taken by another user
+    const existingUser = await User.findOne({ username, _id: { $ne: userId } });
+    if (existingUser) {
+      return res.status(400).json({ error: 'Username already taken.' });
     }
     
     const user = await User.findById(req.user._id);

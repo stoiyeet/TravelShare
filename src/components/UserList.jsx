@@ -22,7 +22,10 @@ if (shouldRefresh) {
 }
 }, [shouldRefresh]);
 
+  let noGroupsMade = false; 
+
   if (!activeGroup) {
+    noGroupsMade = true;
     activeGroup = cities.map(city => city.owners?.[0]).filter(Boolean);
   }
 
@@ -42,13 +45,19 @@ if (shouldRefresh) {
   }
 
 
-  return (
+return (
+  <>
+    {noGroupsMade && (
+      <Message message="No groups have been made yet. Please make one for a better viewing experience!!" />
+    )}
     <ul className={styles.cityList}>
       {visitors.map((visitor) => (
         <UserItem key={visitor} visitor={visitor} color={visitorColors[visitor]} />
-    ))}
+      ))}
     </ul>
-  );
+  </>
+);
+
 }
 
 export default UserList;

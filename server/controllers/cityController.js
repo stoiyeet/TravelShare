@@ -222,7 +222,7 @@ exports.getAllCities = async (req, res) => {
         if (!cityOwnerMap[idStr]) {
           cityOwnerMap[idStr] = [];
         }
-        cityOwnerMap[idStr].push({ username: user.username, color: user.color });
+        cityOwnerMap[idStr].push({ username: user.username });
       }
     }
 

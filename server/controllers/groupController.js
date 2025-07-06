@@ -96,7 +96,6 @@ const createGroup = async (req, res) => {
   }
 };
 
-// Update a group
 const updateGroup = async (req, res) => {
   try {
     const { id } = req.params;
@@ -127,43 +126,53 @@ const updateGroup = async (req, res) => {
     if (members && Array.isArray(members)) {
       const processedMembers = [];
       
-      // Always keep the creator as the first member
-      const creatorMember = group.members.find(member => 
-        member.user.toString() === req.user._id.toString()
-      );
-      if (creatorMember) {
-        processedMembers.push(creatorMember);
-      } else {
-        processedMembers.push({
-          user: req.user._id,
-          color: "#000",
-        });
-      }
+      // Create a map to track which users should be included and their colors
+      const memberMap = new Map();
+      
+      // Always include the creator first
+      memberMap.set(req.user._id.toString(), {
+        user: req.user._id,
+        color: "#000", // Default color for creator
+      });
 
+      // Process all members from the request
       for (const memberData of members) {
         let userId;
         let color = "#000";
 
         if (typeof memberData === "string") {
           const user = await User.findOne({ username: memberData });
-          if (user && user._id.toString() !== req.user._id.toString()) {
-            userId = user._id;
+          if (user) {
+            userId = user._id.toString();
           }
         } else if (memberData.user) {
           const user = await User.findOne({ username: memberData.user });
-          if (user && user._id.toString() !== req.user._id.toString()) {
-            userId = user._id;
+          if (user) {
+            userId = user._id.toString();
             color = memberData.color || "#000";
           }
         }
 
         if (userId) {
-          processedMembers.push({
+          memberMap.set(userId, {
             user: userId,
             color: color,
           });
         }
       }
+
+      // Convert map to array, ensuring creator is first
+      const creatorId = req.user._id.toString();
+      if (memberMap.has(creatorId)) {
+        processedMembers.push(memberMap.get(creatorId));
+        memberMap.delete(creatorId);
+      }
+      
+      // Add remaining members
+      for (const memberData of memberMap.values()) {
+        processedMembers.push(memberData);
+      }
+
       group.members = processedMembers;
     }
 

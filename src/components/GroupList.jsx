@@ -97,7 +97,6 @@ function GroupList() {
     if (!newGroupName.trim()) return;
 
     const membersWithColors = selectedMembers
-      .filter(username => username !== user.username)
       .map(username => ({
         user: username,
         color: memberColors[username]
@@ -120,7 +119,6 @@ function GroupList() {
   const startEdit = (group) => {
     setNewGroupName(group.name);
     const memberUsernames = group.members
-      .filter(member => member.username !== user.username)
       .map(member => member.username);
 
     setSelectedMembers(memberUsernames);
@@ -163,14 +161,18 @@ function GroupList() {
     setOpenDropdown(null);
   };
 
-  const handleRemoveMember = (username) => {
-    setSelectedMembers(prev => prev.filter(member => member !== username));
-    setMemberColors(prev => {
-      const newColors = { ...prev };
-      delete newColors[username];
-      return newColors;
-    });
-  };
+const handleRemoveMember = (username) => {
+  setSelectedMembers(prev => prev.filter(member => member !== username));
+
+  setMemberColors(prev => {
+    const updated = { ...prev };
+    if (username !== user.username) {
+      delete updated[username];
+    }
+    return updated;
+  });
+};
+
 
   const updateMemberColor = (username, color) => {
     const usedColors = Object.entries(memberColors)

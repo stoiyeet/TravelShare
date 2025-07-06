@@ -45,8 +45,7 @@ function mapColorFromOwner(city, user, activeGroup) {
   }
   
   // Fallback to city owner color or user color
-  if (city.owners?.length > 0) return city.owners[0].color;
-  else return user?.color || "000";
+  if (city.owners?.length > 0) return "#aaa";
 }
 
 function Map() {

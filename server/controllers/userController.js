@@ -20,9 +20,6 @@ exports.updateProfile = async (req, res) => {
     if (avatar !== undefined) {
       user.avatar = avatar;
     }
-    if (color !== undefined) {
-      user.color = color;
-    }
     
     await user.save();
     
@@ -30,7 +27,6 @@ exports.updateProfile = async (req, res) => {
       username: user.username,
       email: user.email,
       avatar: user.avatar,
-      color: user.color,
     };
     
     res.status(200).json({
@@ -98,7 +94,7 @@ exports.getAvailableColours = async (req, res) => {
 exports.getAllUsersColors = async (req, res) => {
   try {
     const users = await User.find({}, 'username color');
-    const colors = users.map(user => ({ username: user.username, color: user.color }));
+    const colors = users.map(user => ({ username: user.username}));
     res.status(200).json(colors);
   } catch (err) {
     console.error("Get users colors error:", err);
@@ -109,12 +105,7 @@ exports.getAllUsersColors = async (req, res) => {
 exports.getAllUsers = async (req, res) => {
   try {
     const users = await User.find({}, 'username email color avatar');
-    // Set default color to #000 for users without a color
-    const usersWithDefaultColor = users.map(user => ({
-      ...user.toObject(),
-      color: user.color || "#000"
-    }));
-    res.status(200).json(usersWithDefaultColor);
+    res.status(200).json(users);
   } catch (err) {
     console.error("Get all users error:", err);
     res.status(500).json({ message: "Server error", error: err.message });

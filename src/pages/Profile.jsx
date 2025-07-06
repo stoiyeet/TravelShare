@@ -1,7 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
-import { userAPI, getAvailableColours } from "../services/userService";
 import styles from "./Profile.module.css";
 
 function Profile() {
@@ -11,7 +10,6 @@ function Profile() {
   const [formData, setFormData] = useState({
     username: user.username || "",
     avatar: user.avatar || "",
-    color: user.color || "#aaa",
   });
   
   const [passwordData, setPasswordData] = useState({
@@ -22,31 +20,7 @@ function Profile() {
   
   const [message, setMessage] = useState({ type: "", text: "" });
   const [isLoading, setIsLoading] = useState(false);
-  const [usedColors, setUsedColors] = useState([]);
-  const [availableColors, setAvailableColors] = useState([]);
-  const [allColors, setAllColors] = useState([]);
-  
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const [colorsResponse, usedColorsData] = await Promise.all([
-          getAvailableColours(),
-          userAPI("colors", "GET")
-        ]);
-        
-        setAllColors(colorsResponse.colors);
-        setUsedColors(usedColorsData.map(item => item.color));
-      } catch (err) {
-        console.error("Error fetching data:", err);
-      }
-    }
-    fetchData();
-  }, []);
-  
-  useEffect(() => {
-    const available = allColors.filter(color => !usedColors.includes(color));
-    setAvailableColors(available);
-  }, [allColors, usedColors, user.color]);
+
 
   function handleChange(e) {
     const { name, value } = e.target;
@@ -147,20 +121,6 @@ function Profile() {
                 placeholder="https://example.com/avatar.jpg"
               />
               <small>Leave empty to use default avatar</small>
-            </div>
-            
-            <div className={styles.formGroup}>
-              <label htmlFor="color">Color Options</label>
-              <div className={styles.colorOptions}>
-                {availableColors.map(color => (
-                  <div
-                    key={color}
-                    className={styles.colorSwatch}
-                    style={{ backgroundColor: color }}
-                    onClick={() => setFormData(prev => ({ ...prev, color }))}
-                  ></div>
-                ))}
-              </div>
             </div>
             
             <button 

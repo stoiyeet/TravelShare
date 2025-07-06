@@ -6,12 +6,12 @@ const {
   deleteGroup,
   getGroup,
 } = require("../controllers/groupController");
-const { auth } = require("../controllers/authController");
+const authController = require("../controllers/authController");
 
 const router = express.Router();
 
 // Protect all routes - user must be authenticated
-router.use(auth);
+router.use(authController.auth);
 
 // Routes
 router.route("/")

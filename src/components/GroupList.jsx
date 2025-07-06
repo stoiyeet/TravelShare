@@ -62,6 +62,12 @@ function GroupList() {
   };
 
   const getUsedColors = () => Object.values(memberColors);
+  
+  const hexToRGBA = (hex, alpha = 1) => {
+  const [r, g, b] = hex.match(/\w\w/g).map((x) => parseInt(x, 16));
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+};
+
 
   const handleCreateGroup = (e) => {
     e.preventDefault();
@@ -183,10 +189,6 @@ function GroupList() {
     user.username.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const availableUsersToAdd = filteredUsers.filter(user => 
-    !selectedMembers.includes(user.username)
-  );
-
   const getAvailableColorsForUser = (username) => {
     const usedColors = getUsedColors();
     return availableColors.filter(color => !usedColors.includes(color));
@@ -208,7 +210,6 @@ function GroupList() {
   return (
     <div className={styles.groupList}>
       <div className={styles.header}>
-        <h3>Groups</h3>
         <Button
           type="primary"
           onClick={() => {
@@ -280,7 +281,10 @@ function GroupList() {
                           cursor: 'pointer',
                           border: memberColors[user.username] === color ? '2px solid #333' : '2px solid #ddd'
                         }}
-                        onClick={() => updateMemberColor(user.username, color)}
+                        onClick={() => {
+                          updateMemberColor(user.username, color);
+                          setOpenDropdown(null);
+                        }}
                         title={`Select your color`}
                       ></div>
                     ))}
@@ -291,55 +295,63 @@ function GroupList() {
 
           <div className={styles.memberSelection}>
             <h5>{showCreateForm ? "Add Members" : "Edit Members"}:</h5>
-            
-            {/* Selected Members Display */}
-            {selectedMembers.length > 0 && (
-              <div className={styles.selectedMembers}>
-                <h6>Selected Members:</h6>
-                <div className={styles.selectedMembersList}>
-                  {selectedMembers.map((username) => (
-                    <div key={username} className={styles.selectedMemberItem}>
-                      <span
-                        className={styles.colorDot}
-                        style={{ backgroundColor: memberColors[username] || "#000" }}
-                      ></span>
-                      {username}
-                      <div className={styles.colorOptions}>
-                        {availableColors
-                          .filter(color => !getUsedColors().includes(color) || memberColors[username] === color)
-                          .map(color => (
-                            <div
-                              key={color}
-                              className={styles.colorSwatch}
-                              style={{ backgroundColor: color }}
-                              onClick={() => updateMemberColor(username, color)}
-                            ></div>
-                          ))}
-                      </div>
-                      <button
-                        type="button"
-                        className={styles.removeMemberBtn}
-                        onClick={() => handleRemoveMember(username)}
-                        title="Remove member"
-                      >
-                        ×
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Available Users to Add */}
-            <input
+                      <input
               type="text"
               placeholder="Search users to add..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className={styles.searchInput}
             />
-            <div className={styles.usersList}>
-              {availableUsersToAdd.map((user) => (
+            {selectedMembers.length > 0 && (
+            <button
+              type="button"
+              className={styles.clearSelectionBtn}
+              onClick={() => {
+                setSelectedMembers([]);
+                setMemberColors((prev) => {
+                  const updated = { ...prev };
+                  Object.keys(updated).forEach((key) => {
+                    if (key !== user.username) delete updated[key]; // preserve creator color
+                  });
+                  return updated;
+                });
+              }}
+            >
+              ✖ Clear Selection
+            </button>
+          )}
+
+            <div className={styles.userListScrollContainer}>
+              {filteredUsers.map((user) => {
+              const isSelected = selectedMembers.includes(user.username);
+
+              return isSelected ? (
+                <div key={user.username} className={styles.selectedMemberItem} style={{ background: `${hexToRGBA(memberColors[user.username] || "#000", 0.2)}` }}
+
+>
+                  {user.username}
+                  <div className={styles.colorOptions}>
+                    {availableColors
+                      .filter(color => !getUsedColors().includes(color) || memberColors[user.username] === color)
+                      .map(color => (
+                        <div
+                          key={color}
+                          className={styles.colorSwatch}
+                          style={{ backgroundColor: color }}
+                          onClick={() => updateMemberColor(user.username, color)}
+                        ></div>
+                      ))}
+                  </div>
+                  <button
+                    type="button"
+                    className={styles.removeMemberBtn}
+                    onClick={() => handleRemoveMember(user.username)}
+                    title="Remove member"
+                  >
+                    ×
+                  </button>
+                </div>
+              ) : (
                 <div key={user.username} className={styles.userItem}>
                   <div 
                     className={styles.userDropdownTrigger}
@@ -350,7 +362,7 @@ function GroupList() {
                       {openDropdown === user.username ? '▲' : '▼'}
                     </span>
                   </div>
-                  
+
                   {openDropdown === user.username && (
                     <div className={styles.colorDropdown}>
                       {getAvailableColorsForUser(user.username).length > 0 ? (
@@ -369,7 +381,9 @@ function GroupList() {
                     </div>
                   )}
                 </div>
-              ))}
+              );
+            })}
+
             </div>
           </div>
 

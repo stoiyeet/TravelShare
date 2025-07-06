@@ -1,5 +1,7 @@
+/* Modern Dark Grey Theme - Group Management Styles */
+
 .groupList {
-  padding: 1rem;
+  padding: 1.5rem;
   height: 100%;
   overflow-y: auto;
 }
@@ -8,122 +10,144 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1.5rem;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid var(--color-light--2);
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 2px solid #42484d;
 }
 
 .header h3 {
   margin: 0;
-  color: var(--color-light--2);
-  font-size: 1.2rem;
+  color: #ececec;
+  font-size: 1.5rem;
+  font-weight: 600;
+  letter-spacing: -0.025em;
 }
 
 .groupForm {
-  background: var(--color-dark--2);
-  padding: 1.5rem;
-  border-radius: 7px;
-  margin-bottom: 1.5rem;
-  border: 1px solid var(--color-light--3);
+  background: #2d3439;
+  padding: 2rem;
+  border-radius: 12px;
+  margin-bottom: 2rem;
+  border: 1px solid #42484d;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 .groupForm h4 {
-  margin: 0 0 1rem 0;
-  color: var(--color-light--2);
-  font-size: 1rem;
+  margin: 0 0 1.5rem 0;
+  color: #ececec;
+  font-size: 1.1rem;
+  font-weight: 600;
 }
 
 .groupForm input[type="text"] {
   width: 100%;
-  padding: 0.8rem;
-  border: 1px solid var(--color-light--3);
-  border-radius: 5px;
-  background: var(--color-dark--1);
-  color: var(--color-light--2);
-  margin-bottom: 1rem;
-  font-size: 0.9rem;
+  padding: 0.875rem 1rem;
+  border: 2px solid #42484d;
+  border-radius: 8px;
+  background: #242a2e;
+  color: #ececec;
+  margin-bottom: 1.5rem;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
 }
 
 .groupForm input[type="text"]:focus {
   outline: none;
-  border-color: var(--color-brand--2);
+  border-color: #d6dee0;
+  background: #2d3439;
+  box-shadow: 0 0 0 3px rgba(214, 222, 224, 0.1);
 }
 
 .memberSelection {
-  margin-bottom: 1.5rem;
+  margin-bottom: 2rem;
 }
 
 .memberSelection h5 {
-  margin: 0 0 0.8rem 0;
-  color: var(--color-light--2);
-  font-size: 0.9rem;
+  margin: 0 0 1rem 0;
+  color: #ececec;
+  font-size: 1rem;
   font-weight: 600;
 }
 
 .memberOption {
   display: flex;
   align-items: center;
-  gap: 0.8rem;
-  padding: 0.5rem 0;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
   cursor: pointer;
-  color: var(--color-light--2);
-  font-size: 0.9rem;
+  color: #ececec;
+  font-size: 0.95rem;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  margin-bottom: 0.5rem;
 }
 
 .memberOption:hover {
-  background: var(--color-dark--1);
-  border-radius: 3px;
-  padding-left: 0.5rem;
-  padding-right: 0.5rem;
+  background: #42484d;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  z-index: 10;
 }
 
 .memberOption input[type="checkbox"] {
   margin: 0;
+  width: 18px;
+  height: 18px;
+  accent-color: #d6dee0;
 }
 
 .colorDot {
-  width: 12px;
-  height: 12px;
+  width: 14px;
+  height: 14px;
   border-radius: 50%;
-  border: 1px solid var(--color-light--3);
+  border: 2px solid #42484d;
+  flex-shrink: 0;
 }
 
 .formButtons {
   display: flex;
   gap: 1rem;
+  margin-top: 2rem;
 }
 
 .groups {
   display: flex;
   flex-direction: column;
-  gap: 0.8rem;
+  gap: 1rem;
 }
 
 .groupItem {
+  height: 12vh;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: var(--color-dark--2);
-  border: 1px solid var(--color-light--3);
-  border-radius: 7px;
-  padding: 1rem;
+  background: #2d3439;
+  border: 2px solid #42484d;
+  border-radius: 12px;
+  padding: 1.5rem;
   cursor: pointer;
-  transition: all 0.3s;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .groupItem:hover {
-  background: var(--color-dark--1);
-  border-color: var(--color-brand--2);
+  background: #42484d;
+  border-color: #d6dee0;
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
 }
 
 .groupItem.active {
-  background: var(--color-brand--2);
-  border-color: var(--color-brand--1);
+  background: linear-gradient(135deg, #d6dee0 0%, #aaa 100%);
+  border-color: #ececec;
+  color: #242a2e;
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px rgba(214, 222, 224, 0.3);
 }
 
 .groupItem.active .groupInfo h4,
 .groupItem.active .groupInfo p {
-  color: var(--color-dark--1);
+  color: #242a2e;
 }
 
 .groupInfo {
@@ -131,43 +155,48 @@
 }
 
 .groupInfo h4 {
-  margin: 0 0 0.3rem 0;
-  color: var(--color-light--2);
-  font-size: 1rem;
+  margin: 0 0 0.5rem 0;
+  color: #ececec;
+  font-size: 1.1rem;
   font-weight: 600;
 }
 
 .groupInfo p {
-  margin: 0 0 0.5rem 0;
-  color: var(--color-light--1);
-  font-size: 0.8rem;
+  margin: 0 0 0.75rem 0;
+  color: #aaa;
+  font-size: 0.875rem;
 }
 
 .members {
   display: flex;
-  gap: 0.3rem;
+  gap: 0.5rem;
   flex-wrap: wrap;
 }
 
 .member {
-  width: 24px;
-  height: 24px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   color: white;
-  font-size: 0.7rem;
+  font-size: 0.75rem;
   font-weight: 600;
-  border: 1px solid var(--color-light--3);
-  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);
+  border: 2px solid #42484d;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
+  transition: transform 0.2s ease;
+}
+
+.member:hover {
+  transform: scale(1.1);
 }
 
 .groupActions {
   display: flex;
   gap: 0.5rem;
-  opacity: 0.7;
-  transition: opacity 0.3s;
+  opacity: 0.6;
+  transition: opacity 0.3s ease;
 }
 
 .groupItem:hover .groupActions {
@@ -179,173 +208,329 @@
   background: none;
   border: none;
   cursor: pointer;
-  padding: 0.3rem;
-  border-radius: 3px;
-  font-size: 0.9rem;
-  transition: background 0.3s;
+  padding: 0.5rem;
+  border-radius: 6px;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+  color: #aaa;
 }
 
 .editBtn:hover {
-  background: var(--color-brand--2);
+  background: #d6dee0;
+  color: #242a2e;
+  transform: scale(1.05);
 }
 
 .deleteBtn:hover {
   background: #dc3545;
+  color: white;
+  transform: scale(1.05);
+}
+
+.groupItem.active .editBtn,
+.groupItem.active .deleteBtn {
+  color: #242a2e;
+  opacity: 0.8;
 }
 
 .groupItem.active .editBtn:hover,
 .groupItem.active .deleteBtn:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(36, 42, 46, 0.2);
+  color: #242a2e;
+  opacity: 1;
 }
 
-/* New CSS classes for the dropdown color picker functionality */
-
-/* User dropdown trigger */
+/* Enhanced User Dropdown Styles */
 .userDropdownTrigger {
-  padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
+  padding: 0.875rem 1rem;
+  border: 2px solid #42484d;
+  border-radius: 8px;
   cursor: pointer;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: #f9f9f9;
-  transition: background-color 0.2s ease;
+  background: linear-gradient(135deg, #2d3439 0%, #242a2e 100%);
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .userDropdownTrigger:hover {
-  background-color: #f0f0f0;
+  background: linear-gradient(135deg, #42484d 0%, #2d3439 100%);
+  border-color: #d6dee0;
+  transform: translateY(-1px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
 }
 
-/* Username text */
 .userName {
   font-weight: 500;
-  color: #333;
+  color: #ececec;
+  font-size: 0.95rem;
 }
 
-/* Dropdown arrow */
 .dropdownArrow {
-  font-size: 12px;
-  color: #666;
-  margin-left: 8px;
+  font-size: 0.75rem;
+  color: #aaa;
+  margin-left: 0.5rem;
+  transition: transform 0.2s ease;
 }
 
-/* User item container - needs relative positioning for dropdown */
+.userDropdownTrigger:hover .dropdownArrow {
+  transform: rotate(180deg);
+  color: #d6dee0;
+}
+
 .userItem {
   position: relative;
-  margin-bottom: 10px;
+  margin-bottom: 1rem;
 }
 
-/* Color dropdown container */
 .colorDropdown {
   position: absolute;
   top: 100%;
   left: 0;
   right: 0;
-  background-color: white;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  padding: 10px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  background: #2d3439;
+  border: 2px solid #42484d;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.4), 0 8px 16px rgba(0, 0, 0, 0.2);
   z-index: 1000;
   display: flex;
   flex-wrap: wrap;
-  gap: 5px;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
 }
 
-/* Individual color swatch options */
 .colorSwatchOption {
-  width: 30px;
-  height: 30px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   cursor: pointer;
-  border: 2px solid #ddd;
-  transition: transform 0.2s ease, border-color 0.2s ease;
-}
-
-.colorSwatchOption:hover {
-  transform: scale(1.1);
-  border-color: #999;
-}
-
-/* No colors available message */
-.noColorsMessage {
-  color: #666;
-  font-style: italic;
-  padding: 5px;
-}
-
-/* Selected members section */
-.selectedMembers {
-  margin-bottom: 20px;
-}
-
-.selectedMembers h6 {
-  margin-bottom: 10px;
-  color: #333;
-  font-weight: 600;
-}
-
-/* Selected members list */
-.selectedMembersList {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-/* Individual selected member item */
-.selectedMemberItem {
-  display: flex;
-  align-items: center;
-  padding: 8px;
-  background-color: #f8f9fa;
-  border-radius: 6px;
-  border: 1px solid #e9ecef;
+  border: 3px solid #42484d;
+  transition: all 0.2s ease;
   position: relative;
 }
 
-.selectedMemberItem .colorDot {
-  margin-right: 8px;
+.colorSwatchOption:hover {
+  transform: scale(1.15);
+  border-color: #d6dee0;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
 }
 
-/* Remove member button */
+.colorSwatchOption::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 0;
+  height: 0;
+  border: 2px solid white;
+  border-radius: 50%;
+  opacity: 0;
+  transition: all 0.2s ease;
+}
+
+.colorSwatchOption:hover::after {
+  width: 8px;
+  height: 8px;
+  opacity: 1;
+}
+
+.noColorsMessage {
+  color: #aaa;
+  font-style: italic;
+  padding: 1rem;
+  text-align: center;
+  width: 100%;
+}
+
+/* Selected Members Styling */
+.selectedMembers {
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, #2d3439 0%, #242a2e 100%);
+  border-radius: 12px;
+  border: 1px solid #42484d;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.selectedMembers h6 {
+  margin-bottom: 1rem;
+  color: #ececec;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.selectedMembersList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.selectedMemberItem {
+  display: flex;
+  align-items: center;
+  padding: 1rem 1.25rem;
+  border-radius: 10px;
+  transition: all 0.25s ease;
+  color: #ececec;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  box-shadow:
+    0 0 10px rgba(255, 255, 255, 0.2),
+    0 0 20px rgba(255, 255, 255, 0.1),
+    0 0 30px rgba(255, 255, 255, 0.05),
+    0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+
+.selectedMemberItem:hover {
+  border-color: #ececec;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  background: #2d3439;
+}
+
+.selectedMemberItem .colorDot {
+  margin-right: 1rem;
+  width: 16px;
+  height: 16px;
+  border-width: 2px;
+  border-color: #d6dee0;
+}
+
 .removeMemberBtn {
   background: none;
   border: none;
   color: #dc3545;
-  font-size: 18px;
+  font-size: 1.25rem;
   font-weight: bold;
   cursor: pointer;
-  padding: 2px 6px;
-  border-radius: 3px;
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
   margin-left: auto;
-  transition: background-color 0.2s ease;
+  transition: all 0.2s ease;
+  opacity: 0.7;
 }
 
 .removeMemberBtn:hover {
-  background-color: #f5c6cb;
+  background: #dc3545;
+  color: white;
+  opacity: 1;
+  transform: scale(1.1);
 }
 
-/* Color options for selected members */
 .selectedMemberItem .colorOptions {
-  margin-left: 12px;
-  margin-right: 12px;
+  margin-left: 1rem;
+  margin-right: 1rem;
 }
 
-/* Responsive adjustments */
+.userListScrollContainer {
+  min-height: 100px;
+  max-height: 200px; 
+  min-width: 280px;
+  overflow-y: auto;
+  border: 1px solid #42484d;
+  border-radius: 12px;
+  padding: 1rem;
+  background: #242a2e;
+  box-shadow: inset 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Scrollbar Styling for Dark Theme */
+.userListScrollContainer::-webkit-scrollbar {
+  width: 8px;
+}
+
+.userListScrollContainer::-webkit-scrollbar-track {
+  background: #2d3439;
+  border-radius: 4px;
+}
+
+.userListScrollContainer::-webkit-scrollbar-thumb {
+  background: #42484d;
+  border-radius: 4px;
+  transition: background 0.2s ease;
+}
+
+.userListScrollContainer::-webkit-scrollbar-thumb:hover {
+  background: #d6dee0;
+}
+
+.clearSelectionBtn {
+  background: none;
+  border: none;
+  color: #87929c;
+  font-size: 0.85rem;
+  margin: 0.5rem 0 1rem 0;
+  cursor: pointer;
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  align-self: flex-start;
+}
+
+.clearSelectionBtn:hover {
+  text-decoration: underline;
+  color: #ffffff;
+  transform: translateX(2px);
+}
+
+
+/* Responsive Design */
 @media (max-width: 768px) {
+  .groupList {
+    padding: 1rem;
+  }
+  
+  .groupForm {
+    padding: 1.5rem;
+  }
+  
   .colorDropdown {
-    left: -10px;
-    right: -10px;
+    left: -0.5rem;
+    right: -0.5rem;
+    padding: 1rem;
   }
   
   .selectedMemberItem {
     flex-wrap: wrap;
+    padding: 1rem;
   }
   
   .selectedMemberItem .colorOptions {
     margin-left: 0;
-    margin-top: 8px;
+    margin-top: 0.75rem;
     flex-basis: 100%;
   }
+  
+  .colorSwatchOption {
+    width: 32px;
+    height: 32px;
+  }
+  
+  .groupItem {
+    padding: 1.25rem;
+  }
+}
+
+/* Additional Dark Theme Enhancements */
+.groupForm input[type="text"]::placeholder {
+  color: #aaa;
+}
+
+.groupItem.active .member {
+  border-color: #242a2e;
+}
+
+/* Focus states for better accessibility */
+.groupItem:focus,
+.userDropdownTrigger:focus,
+.selectedMemberItem:focus {
+  outline: 2px solid #d6dee0;
+  outline-offset: 2px;
+}
+
+button:hover {
+  transform: translateY(-3px) scale(1.03);
 }

@@ -8,7 +8,7 @@ function UserItem({ visitor, color }) {
   return (
     <li className={`${styles.card} ${expanded ? styles.expanded : ""}`} onClick={() => setExpanded(!expanded)}>
   <div className={styles.header}>
-    <div className={styles.colorBar} style={{ backgroundColor: color }}></div>
+    <div className={styles.colorBar} style={{ backgroundColor: color || "#aaa" }}></div>
     <h3 className={styles.username}>{visitor}</h3>
   </div>
 

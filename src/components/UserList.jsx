@@ -9,7 +9,7 @@ import { useEffect } from "react";
 
 
 function UserList() {
-  const { cities, fetchCities, activeGroup } = useFilteredCities();
+  let { cities, fetchCities, activeGroup } = useFilteredCities();
   const visitors = [...new Set(cities.flatMap(city => (city.owners || []).map(owner => owner.username)))];
   const location = useLocation();
   const shouldRefresh = location.state?.refresh;
@@ -23,9 +23,7 @@ if (shouldRefresh) {
 }, [shouldRefresh]);
 
   if (!activeGroup) {
-    return (
-      <Message message="Please select a group to view cities" />
-    );
+    activeGroup = cities.map(city => city.owners?.[0]).filter(Boolean);
   }
 
   if (!visitors.length)

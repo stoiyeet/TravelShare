@@ -66,7 +66,7 @@ function City() {
       }
       await getCity(id);
     } catch {
-      setImageError("Failed to upload image(s). Please try again.");
+      setImageError("Failed to upload image(s). Please note that HEIC files cannot be uploaded");
     } finally {
       setImageUploadLoading(false);
       e.target.value = "";
@@ -259,7 +259,7 @@ function City() {
                 </div>
                 <div className={styles.row}>
                   <label htmlFor="notes">Your notes:</label>
-                  <input
+                  <textarea
                     type="text"
                     id="notes"
                     value={formNotes}

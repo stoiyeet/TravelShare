@@ -397,7 +397,19 @@ const handleRemoveMember = (username) => {
       )}
 
       {groups.length === 0 && !showCreateForm ? (
-        <Message message="Create your first group to start sharing your travels 🤗" />
+        <Message
+          message={
+            <>
+              Create your first group to start sharing your travels! 🤗
+              <br />
+              <br />
+              <span style={{ fontSize: "0.75em" }}>
+                (No one else can see the groups you create)
+              </span>
+            </>
+          }
+        />
+
       ) : (
         <div className={styles.groups}>
           {groups.map((group) => (

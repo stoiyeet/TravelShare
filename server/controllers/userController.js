@@ -13,15 +13,16 @@ exports.updateProfile = async (req, res) => {
         message: "Username is required",
       });
     }
+
+    const user = await User.findById(req.user._id);
+
     
     // Check if username is taken by another user
     const existingUser = await User.findOne({ username, _id: { $ne: userId } });
-    if (existingUser) {
+    if (existingUser && existingUser.username != user.username) {
       return res.status(400).json({ error: 'Username already taken.' });
     }
-    
-    const user = await User.findById(req.user._id);
-    
+        
     user.username = username;
     if (avatar !== undefined) {
       user.avatar = avatar;

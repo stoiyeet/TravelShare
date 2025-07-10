@@ -48,7 +48,7 @@ if (shouldRefresh) {
 return (
   <>
     {noGroupsMade && (
-      <Message message="No groups have been made yet. Please make one for a better viewing experience!!" />
+      <Message message="Make a group to curate your feed and add some color to the map! No one else can see the groups you make." />
     )}
     <ul className={styles.cityList}>
       {visitors.map((visitor) => (

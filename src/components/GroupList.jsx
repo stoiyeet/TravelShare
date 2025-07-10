@@ -400,7 +400,7 @@ const handleRemoveMember = (username) => {
         <Message
           message={
             <>
-              Create your first group to start sharing your travels! 🤗
+              Create a viewing group to customize your feed and add color!!
               <br />
               <br />
               <span style={{ fontSize: "0.75em" }}>
